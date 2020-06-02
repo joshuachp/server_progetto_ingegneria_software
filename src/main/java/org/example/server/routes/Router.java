@@ -65,7 +65,8 @@ public class Router {
      * @param session User session
      * @return Return JSONObject of user data
      */
-    public JSONObject autenticateUser(String session) {
+    @PostMapping(value = "/api/user/autenticate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JSONObject autenticateUser(@RequestParam(value = "session") String session) {
         if (userSessions.containsKey(session)) {
             User user = userSessions.get(session);
             return new JSONObject()
@@ -82,7 +83,8 @@ public class Router {
      * @param session The session to delete
      * @return True for success
      */
-    private boolean deautenticateUser(String session) {
+    @PostMapping(value = "/api/user/autenticate", produces = MediaType.APPLICATION_JSON_VALUE)
+    private boolean deautenticateUser(@RequestParam(value = "session") String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return true;

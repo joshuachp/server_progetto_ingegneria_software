@@ -46,6 +46,7 @@ public class User {
 
     /**
      * Aggiorna il database con le informazioni dell'ogetto utente
+     *
      * @return True se aggiornato con successo
      */
     public boolean updateUser() {
