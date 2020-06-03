@@ -1,4 +1,5 @@
-package org.example.server;
+package org.example.server.database;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;

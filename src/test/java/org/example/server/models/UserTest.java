@@ -1,16 +1,19 @@
 package org.example.server.models;
 
-import junit.framework.TestCase;
-import org.example.server.MockDatabase;
+import org.example.server.database.MockDatabase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test suit per la classe User
  */
-public class UserTest extends TestCase {
+public class UserTest {
 
     /**
      * Controlla che getUser sia eseguito correttamente
      */
+    @Test
     public void testGetUser() {
         MockDatabase.createMockDatabase();
         User user = User.getUser("admin");
@@ -21,6 +24,7 @@ public class UserTest extends TestCase {
     /**
      * Controlla che updateUser sia eseguito correttamente
      */
+    @Test
     public void testUpdateUser() {
         MockDatabase.createMockDatabase();
         User admin = User.getUser("admin");

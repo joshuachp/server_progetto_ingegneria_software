@@ -1,7 +1,7 @@
 package org.example.server.routes;
 
 
-import org.example.server.Database;
+import org.example.server.database.Database;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
 import org.json.JSONObject;

@@ -1,5 +1,7 @@
 package org.example.server.models;
 
+import org.example.server.database.Database;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +30,7 @@ public class User {
      * @return Informazioni dell'utente o null se non trovato
      */
     public static User getUser(String username) {
-        org.example.server.Database database = org.example.server.Database.getInstance();
+        Database database = Database.getInstance();
         try {
             PreparedStatement statement = database.getConnection().prepareStatement("SELECT id, username, password, " +
                     "responsabile FROM users WHERE username = ?");
@@ -50,7 +52,7 @@ public class User {
      * @return True se aggiornato con successo
      */
     public boolean updateUser() {
-        org.example.server.Database database = org.example.server.Database.getInstance();
+        Database database = Database.getInstance();
         try {
             PreparedStatement statement = database.getConnection().prepareStatement("UPDATE users SET username = ?, " +
                     "password = ?, responsabile = ? WHERE id = ?");
