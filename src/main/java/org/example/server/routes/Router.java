@@ -1,9 +1,14 @@
-package org.example.server;
+package org.example.server.routes;
 
 
+import org.example.server.database.Database;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
 import org.json.JSONObject;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +17,8 @@ import java.util.Map;
 /**
  * Server for database interaction
  */
-public class Server {
-
-    /**
-     * Static instance of the server, lazy initialized
-     * TODO: find alternative implementation of server
-     */
-    private static org.example.server.Server server = null;
+@RestController
+public class Router {
 
     /**
      * Map of the authenticated users. It's in memory since we don't have a lot of users.
@@ -28,36 +28,23 @@ public class Server {
     /**
      * Privare server constructor
      */
-    private Server() {
+    private Router() {
         this.userSessions = new HashMap<>();
-        org.example.server.Database.getInstance();
+        Database.getInstance();
     }
 
-
-    /**
-     * Returns or creates an instance of the server
-     *
-     * @return The server instance
-     */
-    public static org.example.server.Server getInstance() {
-        if (server == null) {
-            server = new org.example.server.Server();
-        }
-        return server;
-    }
 
     /**
      * Autentica un utente. Controlla la password con l'hash della password nel
      * database, se coincidono ritorna una token sessione utente.
      *
-     * @param request JSONObject containing username and password
+     * @param username String User username
+     * @param password String User username
      * @return Return JSONObject of user data
      */
-    public JSONObject autenticateUser(JSONObject request) {
-        String username = request.getString("username");
-        String password = request.getString("password");
-        if (username == null || username.isEmpty() || password == null || password.isEmpty())
-            return null;
+    @PostMapping(value = "/api/user/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String autenticateUser(@RequestParam(value = "username") String username,
+                                  @RequestParam(value = "password") String password) {
         User user = User.getUser(username);
         if (user != null && Utils.checkPassword(password, user.getPassword())) {
             String session = Utils.createSession();
@@ -66,7 +53,8 @@ public class Server {
             return new JSONObject()
                     .put("username", user.getUsername())
                     .put("responsabile", user.getResponsabile())
-                    .put("session", session);
+                    .put("session", session)
+                    .toString();
         }
         return null;
     }
@@ -77,7 +65,8 @@ public class Server {
      * @param session User session
      * @return Return JSONObject of user data
      */
-    public JSONObject autenticateUser(String session) {
+    @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JSONObject autenticateUser(@RequestParam(value = "session") String session) {
         if (userSessions.containsKey(session)) {
             User user = userSessions.get(session);
             return new JSONObject()
@@ -94,7 +83,8 @@ public class Server {
      * @param session The session to delete
      * @return True for success
      */
-    private boolean deautenticateUser(String session) {
+    @PostMapping(value = "/api/user/de-authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
+    private boolean deautenticateUser(@RequestParam(value = "session") String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return true;

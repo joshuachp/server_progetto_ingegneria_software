@@ -1,4 +1,4 @@
-package org.example.server;
+package org.example.server.database;
 
 
 import java.sql.Connection;
@@ -17,7 +17,7 @@ public class Database {
     /**
      * Static instance of the database, lazy initialized
      */
-    private static org.example.server.Database database = null;
+    private static Database database = null;
     /**
      * Connection to the SQL database
      */
@@ -39,12 +39,12 @@ public class Database {
      *
      * @return The database instance
      */
-    public static org.example.server.Database getInstance() {
+    public static Database getInstance() {
         // If the database is not initialized it will create a new instance
         if (database == null) {
             // We check here the exception to simplify the constructor
             try {
-                database = new org.example.server.Database();
+                database = new Database();
             } catch (SQLException e) {
                 // if the error message is "out of memory",
                 // it probably means no database file is found
