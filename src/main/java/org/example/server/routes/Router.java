@@ -84,7 +84,7 @@ public class Router {
      * @return True for success
      */
     @PostMapping(value = "/api/user/de-authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    private boolean deautenticateUser(@RequestParam(value = "session") String session) {
+    private boolean deAuthenticateUser(@RequestParam(value = "session") String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return true;
