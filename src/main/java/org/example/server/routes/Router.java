@@ -132,15 +132,16 @@ public class Router {
      * @param surname   Surname
      * @param address   Address
      * @param cap       CAP
-     * @param city      city
-     * @param telephone telephone
+     * @param city      City
+     * @param telephone Telephone
+     * @param payment   Payment
      * @return True on success
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean registerClient(@RequestParam String username, @RequestParam String password,
                                   @RequestParam String name, @RequestParam String surname,
                                   @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                  @RequestParam Integer payment, @RequestParam String telephone) {
+                                  @RequestParam String telephone, @RequestParam Integer payment) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         // TODO: Decide what to do for already authenticated user
@@ -149,6 +150,38 @@ public class Router {
             Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
                     user.getId());
             return client != null;
+        }
+        return false;
+    }
+
+    /**
+     * Create a new manager user
+     *
+     * @param username  Username
+     * @param password  Password
+     * @param badge     Badge
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param role      Role
+     * @return True on success
+     */
+    @PostMapping(value = "/api/manager/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean registerManager(@RequestParam String username, @RequestParam String password,
+                                   @RequestParam String badge, @RequestParam String name, @RequestParam String surname
+            , @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                   @RequestParam String telephone, @RequestParam String role) {
+        User user = User.createUser(username, Utils.hashPassword(password), false);
+        String session = Utils.createSession();
+        // TODO: Decide what to do for already authenticated user
+        userSessions.put(session, user);
+        if (user != null) {
+            Manager manager = Manager.createManager(badge, username, surname, address, cap, city, telephone, role,
+                    user.getId());
+            return manager != null;
         }
         return false;
     }

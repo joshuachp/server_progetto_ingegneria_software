@@ -36,4 +36,22 @@ class RouterTest {
                 .param("payment", "1"))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    void registerManager() throws Exception {
+        this.mockMvc.perform(post("/api/client/register")
+                .param("username", "test")
+                .param("password", "password")
+                .param("badge", "D34DB33F")
+                .param("name", "Name")
+                .param("surname", "Surname")
+                .param("address", "Via Viale 1")
+                .param("cap", "3333")
+                .param("city", "City")
+                .param("telephone", "3334445555")
+                .param("role", "Test"))
+                .andExpect(status().isOk());
+    }
+
 }
