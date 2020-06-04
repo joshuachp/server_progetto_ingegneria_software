@@ -2,9 +2,7 @@ package org.example.server.routes;
 
 
 import org.example.server.database.Database;
-import org.example.server.models.Client;
-import org.example.server.models.Manager;
-import org.example.server.models.User;
+import org.example.server.models.*;
 import org.example.server.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -210,8 +208,20 @@ public class Router {
                     product = products.getJSONObject(i);
                     // Get the section or create it if it doesn't exist
                     String sectionName = product.getString("section");
-                    // TODO: get section
-                    // Section section = Section.;
+                    Section section = Section.getSection(sectionName);
+                    if (section == null) {
+                        section = Section.createSection(sectionName);
+                        if (section == null) {
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
+                        }
+                    }
+                    // Create the product
+                    // TODO: Should fail if product already exists?
+                    if (Product.createProduct(json.getString("name"), json.getString("brand"), json.getInt(
+                            "package_size"),
+                            json.getInt("price"), json.getString("image"), json.getInt("availability"),
+                            json.getString("characteristics"), section.getId()) == null)
+                        System.out.println("Error project not created");
                 }
                 return "OK";
             }

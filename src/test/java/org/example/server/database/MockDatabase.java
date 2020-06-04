@@ -72,6 +72,18 @@ public class MockDatabase {
         statement.addBatch("CREATE TABLE sections (" +
                 "id INTEGER PRIMARY KEY, " +
                 "name TEXT NOT NULL)");
+        // Create table product
+        statement.addBatch("CREATE TABLE products (" +
+                "id INTEGER PRIMARY KEY, " +
+                "name TEXT NOT NULL, " +
+                "brand TEXT NOT NULL, " +
+                "package_size INTEGER NOT NULL, " +
+                "price INTEGER NOT NULL, " +
+                "image TEXT, " +
+                "availability INTEGER NOT NULL DEFAULT 0, " +
+                "characteristics TEXT, " +
+                "section_id INTEGER NOT NULL, " +
+                "FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE ON UPDATE CASCADE); ");
         // Create section table
         // Add user responsabile admin:password
         statement.addBatch("INSERT INTO users (username, password, manager) " +
@@ -87,6 +99,9 @@ public class MockDatabase {
                 "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1)");
         // Add section
         statement.addBatch("INSERT INTO sections(name) VALUES('Section')");
+        // Add product
+        statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
+                "characteristics, section_id) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1)");
         // Execute
         statement.executeBatch();
     }
