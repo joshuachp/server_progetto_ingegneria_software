@@ -14,18 +14,21 @@ public class UserTest {
      * Controlla che getUser sia eseguito correttamente
      */
     @Test
-    public void testGetUser() {
+    public void getUser() {
         MockDatabase.createMockDatabase();
         User user = User.getUser("admin");
         assertNotNull(user);
+        assertEquals(1, user.getId());
         assertEquals("admin", user.getUsername());
+        assertEquals("$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS", user.getPassword());
+        assertTrue(user.getResponsabile());
     }
 
     /**
      * Controlla che updateUser sia eseguito correttamente
      */
     @Test
-    public void testUpdateUser() {
+    public void updateUser() {
         MockDatabase.createMockDatabase();
         User admin = User.getUser("admin");
         assertNotNull(admin);
