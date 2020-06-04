@@ -61,6 +61,27 @@ CREATE TABLE products (
 	FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE orders (
+	id INTEGER PRIMARY KEY,
+	total INTEGER NOT NULL,
+	payment INTEGER NOT NULL,
+	delivery_start INTEGER NOT NULL,
+	delivery_end INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE order_item (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	price INTEGER NOT NULL,
+	quantity INTEGER NOT NULL,
+	total INTEGER NOT NULL,
+	order_id INTEGER NOT NULL,
+    FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
+}
+
+
 ------------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO users (username, password, manager)
