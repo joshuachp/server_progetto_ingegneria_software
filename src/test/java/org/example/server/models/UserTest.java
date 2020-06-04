@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.MockDatabase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,12 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class UserTest {
 
+    @BeforeEach
+    void setUp() {
+        MockDatabase.createMockDatabase();
+    }
+
     /**
      * Controlla che getUser sia eseguito correttamente
      */
     @Test
     public void getUser() {
-        MockDatabase.createMockDatabase();
         User user = User.getUser("admin");
         assertNotNull(user);
         assertEquals(1, user.getId());
@@ -29,7 +34,6 @@ public class UserTest {
      */
     @Test
     public void updateUser() {
-        MockDatabase.createMockDatabase();
         User admin = User.getUser("admin");
         assertNotNull(admin);
         admin.setUsername("username");
@@ -41,5 +45,19 @@ public class UserTest {
         assertEquals("username", user.getUsername());
         assertEquals("password", user.getPassword());
         assertFalse(user.getManager());
+    }
+
+    @Test
+    void createUser() {
+        User user = User.createUser("test", "test", true);
+        assertNotNull(user);
+        assertEquals("test", user.getUsername());
+        assertEquals("test", user.getPassword());
+        assertTrue(user.getManager());
+    }
+
+    @Test
+    void createUserFail() {
+        assertNull(User.createUser("admin", "password", true));
     }
 }

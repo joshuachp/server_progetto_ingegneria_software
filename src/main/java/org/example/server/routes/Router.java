@@ -2,7 +2,7 @@ package org.example.server.routes;
 
 
 import org.example.server.database.Database;
-import org.example.server.models.Cliente;
+import org.example.server.models.Client;
 import org.example.server.models.Manager;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
@@ -45,8 +45,8 @@ public class Router {
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String autenticateUser(@RequestParam(value = "username") String username,
-                                  @RequestParam(value = "password") String password) {
+    public String autenticateUser(@RequestParam String username,
+                                  @RequestParam String password) {
         User user = User.getUser(username);
         if (user != null && Utils.checkPassword(password, user.getPassword())) {
             String session = Utils.createSession();
@@ -71,7 +71,7 @@ public class Router {
                         .put("role", manager.getRole())
                         .toString();
             }
-            Cliente client = Cliente.getClient(user.getId());
+            Client client = Client.getClient(user.getId());
             if (client == null)
                 return null;
             return new JSONObject()
@@ -96,7 +96,7 @@ public class Router {
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JSONObject autenticateUser(@RequestParam(value = "session") String session) {
+    public JSONObject autenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             User user = userSessions.get(session);
             return new JSONObject()
@@ -114,10 +114,74 @@ public class Router {
      * @return True for success
      */
     @PostMapping(value = "/api/user/de-authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    private boolean deAuthenticateUser(@RequestParam(value = "session") String session) {
+    private boolean deAuthenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Create a new client user
+     *
+     * @param username  Username
+     * @param password  Password
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param payment   Payment
+     * @return True on success
+     */
+    @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean registerClient(@RequestParam String username, @RequestParam String password,
+                                  @RequestParam String name, @RequestParam String surname,
+                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                  @RequestParam String telephone, @RequestParam Integer payment) {
+        User user = User.createUser(username, Utils.hashPassword(password), false);
+        String session = Utils.createSession();
+        // TODO: Decide what to do for already authenticated user
+        userSessions.put(session, user);
+        if (user != null) {
+            Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
+                    user.getId());
+            return client != null;
+        }
+        return false;
+    }
+
+    /**
+     * Create a new manager user
+     *
+     * @param username  Username
+     * @param password  Password
+     * @param badge     Badge
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param role      Role
+     * @return True on success
+     */
+    @PostMapping(value = "/api/manager/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean registerManager(@RequestParam String username, @RequestParam String password,
+                                   @RequestParam String badge, @RequestParam String name, @RequestParam String surname
+            , @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                   @RequestParam String telephone, @RequestParam String role) {
+        User user = User.createUser(username, Utils.hashPassword(password), false);
+        String session = Utils.createSession();
+        // TODO: Decide what to do for already authenticated user
+        userSessions.put(session, user);
+        if (user != null) {
+            Manager manager = Manager.createManager(badge, username, surname, address, cap, city, telephone, role,
+                    user.getId());
+            return manager != null;
         }
         return false;
     }

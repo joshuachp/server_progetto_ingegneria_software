@@ -11,6 +11,8 @@ import java.util.Base64;
  */
 public class Utils {
 
+    public static final int BCRYPT_ROUNDS = 12;
+
     /**
      * Check that the password and the hashed password matches
      *
@@ -20,6 +22,16 @@ public class Utils {
      */
     public static boolean checkPassword(String password, String hash) {
         return BCrypt.verifyer().verify(password.toCharArray(), hash.toCharArray()).verified;
+    }
+
+    /**
+     * Created the the salted bcrypt hash of the password
+     *
+     * @param password Password to hash
+     * @return Hashed password
+     */
+    public static String hashPassword(String password) {
+        return BCrypt.withDefaults().hashToString(BCRYPT_ROUNDS, password.toCharArray());
     }
 
     /**
@@ -34,7 +46,6 @@ public class Utils {
         return Base64.getEncoder().encodeToString(bytes);
 
     }
-
 
 
 }
