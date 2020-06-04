@@ -56,10 +56,19 @@ public class Client {
         return null;
     }
 
+
     /**
-     * Create a new user
+     * Create a new client
      *
-     * @return The user created, null on error
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param payment   Payment
+     * @param user_id   User id
+     * @return The new created Client, null on error
      */
     public static Client createClient(String name, String surname, String address, Integer cap, String city,
                                       String telephone, Integer payment, Integer user_id) {

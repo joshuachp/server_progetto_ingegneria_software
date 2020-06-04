@@ -57,6 +57,48 @@ public class Manager {
         return null;
     }
 
+
+    /**
+     * Create a new manager
+     *
+     * @param badge     Badge
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param role      Role
+     * @param user_id   User id
+     * @return The created Manager, null on error
+     */
+    public static Manager createManager(String badge, String name, String surname, String address, Integer cap,
+                                        String city, String telephone, String role, Integer user_id) {
+        Database database = Database.getInstance();
+        if (Client.getClient(user_id) == null) {
+            try {
+                PreparedStatement statement = database.getConnection()
+                        .prepareStatement("INSERT INTO managers " +
+                                "(badge, name, surname, address, cap, city, telephone, role, user_id) " +
+                                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                statement.setString(1, badge);
+                statement.setString(2, name);
+                statement.setString(3, surname);
+                statement.setString(4, address);
+                statement.setInt(5, cap);
+                statement.setString(6, city);
+                statement.setString(7, telephone);
+                statement.setString(8, role);
+                statement.setInt(9, user_id);
+                statement.executeUpdate();
+                return Manager.getManager(user_id);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public Integer getId() {
         return id;
     }
