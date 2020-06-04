@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.MockDatabase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,12 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManagerTest {
 
+
+    @BeforeEach
+    void setUp() {
+        MockDatabase.createMockDatabase();
+    }
+
     /**
      * Test manager is get properly
      */
     @Test
     void getManager() {
-        MockDatabase.createMockDatabase();
         Manager manager = Manager.getManager(1);
         assertNotNull(manager);
         assertEquals(1, manager.getId());

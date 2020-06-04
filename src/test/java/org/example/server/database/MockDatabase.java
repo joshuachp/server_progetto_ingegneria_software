@@ -52,6 +52,7 @@ public class MockDatabase {
                 "cap INT NOT NULL, " +
                 "city TEXT NOT NULL, " +
                 "telephone TEXT NOT NULL, " +
+                "payment INTEGER, " +
                 "user_id INTEGER NOT NULL, " +
                 "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Create manager table
@@ -74,8 +75,8 @@ public class MockDatabase {
         statement.addBatch("INSERT INTO users (username, password, manager) " +
                 "VALUES('guest', '$2y$12$34AOvePv2yzpQN9aN0ixD.DGmVUaBjWOLq5PImEo0wCfD3iB89HwK', 0)");
         // Add client data for guest user
-        statement.addBatch("INSERT INTO clients (name, surname, address, cap, city, telephone, user_id)" +
-                "VALUES ('Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 2)");
+        statement.addBatch("INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id)" +
+                "VALUES ('Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 0, 2)");
         // Add manager data for admin user
         statement.addBatch("INSERT INTO managers (badge, name, surname, address, cap, city, telephone, role, user_id)" +
                 "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1)");

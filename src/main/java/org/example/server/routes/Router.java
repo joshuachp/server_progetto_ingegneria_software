@@ -2,7 +2,7 @@ package org.example.server.routes;
 
 
 import org.example.server.database.Database;
-import org.example.server.models.Cliente;
+import org.example.server.models.Client;
 import org.example.server.models.Manager;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
@@ -71,7 +71,7 @@ public class Router {
                         .put("role", manager.getRole())
                         .toString();
             }
-            Cliente client = Cliente.getClient(user.getId());
+            Client client = Client.getClient(user.getId());
             if (client == null)
                 return null;
             return new JSONObject()
@@ -137,21 +137,19 @@ public class Router {
      * @return True on success
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String registerClient(@RequestParam String username, @RequestParam String password,
-                                 @RequestParam String name, @RequestParam String surname,
-                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                 @RequestParam String telephone) {
+    public boolean registerClient(@RequestParam String username, @RequestParam String password,
+                                  @RequestParam String name, @RequestParam String surname,
+                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                  @RequestParam Integer payment, @RequestParam String telephone) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         // TODO: Decide what to do for already authenticated user
         userSessions.put(session, user);
         if (user != null) {
-            return new JSONObject()
-                    .put("username", user.getUsername())
-                    .put("responsabile", user.getManager())
-                    .put("session", session)
-                    .toString();
+            Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
+                    user.getId());
+            return client != null;
         }
-        return null;
+        return false;
     }
 }
