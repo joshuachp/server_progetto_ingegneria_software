@@ -40,7 +40,7 @@ class RouterTest {
 
     @Test
     void registerManager() throws Exception {
-        this.mockMvc.perform(post("/api/client/register")
+        this.mockMvc.perform(post("/api/manager/register")
                 .param("username", "test")
                 .param("password", "password")
                 .param("badge", "D34DB33F")
