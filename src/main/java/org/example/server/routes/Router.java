@@ -2,6 +2,7 @@ package org.example.server.routes;
 
 
 import org.example.server.database.Database;
+import org.example.server.models.Cliente;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
 import org.json.JSONObject;
@@ -50,6 +51,23 @@ public class Router {
             String session = Utils.createSession();
             // TODO: Decide what to do for already authenticated user
             userSessions.put(session, user);
+            // Check responsabile or client
+            if (!user.getResponsabile()) {
+                Cliente client = Cliente.getClient(user.getId());
+                if (client == null)
+                    return null;
+                return new JSONObject()
+                        .put("username", user.getUsername())
+                        .put("responsabile", user.getResponsabile())
+                        .put("session", session)
+                        .put("name", client.getName())
+                        .put("surname", client.getSurname())
+                        .put("address", client.getAddress())
+                        .put("cap", client.getCap())
+                        .put("city", client.getCity())
+                        .put("telephone", client.getTelephone())
+                        .toString();
+            }
             return new JSONObject()
                     .put("username", user.getUsername())
                     .put("responsabile", user.getResponsabile())

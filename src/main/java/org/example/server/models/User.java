@@ -68,6 +68,10 @@ public class User {
         return false;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public String getUsername() {
         return username;
     }

@@ -18,7 +18,10 @@ public class UserTest {
         MockDatabase.createMockDatabase();
         User user = User.getUser("admin");
         assertNotNull(user);
+        assertEquals(1, user.getId());
         assertEquals("admin", user.getUsername());
+        assertEquals("$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS", user.getPassword());
+        assertTrue(user.getResponsabile());
     }
 
     /**
