@@ -14,13 +14,13 @@ public class User {
     private final Integer id;
     private String username;
     private String password;
-    private boolean responsabile;
+    private boolean manager;
 
-    private User(Integer id, String username, String password, boolean responsabile) {
+    private User(Integer id, String username, String password, boolean manager) {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.responsabile = responsabile;
+        this.manager = manager;
     }
 
     /**
@@ -32,8 +32,8 @@ public class User {
     public static User getUser(String username) {
         Database database = Database.getInstance();
         try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT id, username, password, " +
-                    "responsabile FROM users WHERE username = ?");
+            PreparedStatement statement = database.getConnection()
+                    .prepareStatement("SELECT id, username, password, manager FROM users WHERE username = ?");
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -54,11 +54,11 @@ public class User {
     public boolean updateUser() {
         Database database = Database.getInstance();
         try {
-            PreparedStatement statement = database.getConnection().prepareStatement("UPDATE users SET username = ?, " +
-                    "password = ?, responsabile = ? WHERE id = ?");
+            PreparedStatement statement = database.getConnection()
+                    .prepareStatement("UPDATE users SET username = ?, password = ?, manager = ? WHERE id = ?");
             statement.setString(1, this.username);
             statement.setString(2, this.password);
-            statement.setBoolean(3, this.responsabile);
+            statement.setBoolean(3, this.manager);
             statement.setInt(4, this.id);
             statement.executeUpdate();
             return true;
@@ -88,12 +88,12 @@ public class User {
         this.password = password;
     }
 
-    public boolean getResponsabile() {
-        return responsabile;
+    public boolean getManager() {
+        return manager;
     }
 
-    public void setResponsabile(boolean responsabile) {
-        this.responsabile = responsabile;
+    public void setManager(boolean manager) {
+        this.manager = manager;
     }
 
 }
