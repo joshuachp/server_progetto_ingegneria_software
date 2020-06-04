@@ -15,10 +15,11 @@ public class Cliente {
     private final Integer cap;
     private final String city;
     private final String telephone;
+    private final Integer payment;
     private final Integer user_id;
 
     public Cliente(Integer id, String name, String surname, String address, Integer cap, String city,
-                   String telephone, Integer user_id) {
+                   String telephone, Integer payment, Integer user_id) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -27,6 +28,7 @@ public class Cliente {
         this.city = city;
         this.telephone = telephone;
         this.user_id = user_id;
+        this.payment = payment;
     }
 
     /**
@@ -45,7 +47,7 @@ public class Cliente {
             if (resultSet.next()) {
                 return new Cliente(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
                         resultSet.getString(4), resultSet.getInt(5), resultSet.getString(6),
-                        resultSet.getString(7), resultSet.getInt(8));
+                        resultSet.getString(7), resultSet.getInt(8), resultSet.getInt(9));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,5 +85,9 @@ public class Cliente {
 
     public Integer getUserId() {
         return user_id;
+    }
+
+    public Integer getPayment() {
+        return payment;
     }
 }

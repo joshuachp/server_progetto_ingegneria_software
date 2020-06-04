@@ -42,4 +42,16 @@ public class UserTest {
         assertEquals("password", user.getPassword());
         assertFalse(user.getManager());
     }
+
+    @Test
+    void createUser() {
+        MockDatabase.createMockDatabase();
+        assertNotNull(User.createUser("test", "password", true));
+    }
+
+    @Test
+    void createUserFail() {
+        MockDatabase.createMockDatabase();
+        assertNull(User.createUser("admin", "password", true));
+    }
 }

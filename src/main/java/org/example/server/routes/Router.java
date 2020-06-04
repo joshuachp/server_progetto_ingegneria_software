@@ -45,8 +45,8 @@ public class Router {
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String autenticateUser(@RequestParam(value = "username") String username,
-                                  @RequestParam(value = "password") String password) {
+    public String autenticateUser(@RequestParam String username,
+                                  @RequestParam String password) {
         User user = User.getUser(username);
         if (user != null && Utils.checkPassword(password, user.getPassword())) {
             String session = Utils.createSession();
@@ -96,7 +96,7 @@ public class Router {
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JSONObject autenticateUser(@RequestParam(value = "session") String session) {
+    public JSONObject autenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             User user = userSessions.get(session);
             return new JSONObject()
@@ -114,9 +114,35 @@ public class Router {
      * @return True for success
      */
     @PostMapping(value = "/api/user/de-authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    private boolean deAuthenticateUser(@RequestParam(value = "session") String session) {
+    private boolean deAuthenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Create a new client user
+     *
+     * @param username  Username
+     * @param password  Password
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      city
+     * @param telephone telephone
+     * @return True on success
+     */
+    @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    private boolean registerClient(@RequestParam String username, @RequestParam String password,
+                                   @RequestParam String name, @RequestParam String surname,
+                                   @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                   @RequestParam String telephone) {
+        User user = User.createUser(username, Utils.hashPassword(password), false);
+        if (user != null) {
             return true;
         }
         return false;

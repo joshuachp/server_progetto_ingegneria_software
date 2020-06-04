@@ -47,6 +47,29 @@ public class User {
     }
 
     /**
+     * Create a new user
+     *
+     * @return The user created, null on error
+     */
+    public static User createUser(String username, String password, boolean manager) {
+        Database database = Database.getInstance();
+        if (User.getUser(username) == null) {
+            try {
+                PreparedStatement statement = database.getConnection()
+                        .prepareStatement("INSERT INTO users(username, password, manager) VALUES(?, ?, ?)");
+                statement.setString(1, username);
+                statement.setString(2, password);
+                statement.setBoolean(3, manager);
+                statement.executeUpdate();
+                return User.getUser(username);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Aggiorna il database con le informazioni dell'ogetto utente
      *
      * @return True se aggiornato con successo

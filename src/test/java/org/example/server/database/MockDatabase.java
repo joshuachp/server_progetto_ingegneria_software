@@ -40,7 +40,7 @@ public class MockDatabase {
         // Create user table
         statement.addBatch("CREATE TABLE users ( " +
                 "id INTEGER PRIMARY KEY, " +
-                "username TEXT NOT NULL, " +
+                "username TEXT UNIQUE NOT NULL, " +
                 "password TEXT NOT NULL, " +
                 "manager BOOLEAN NOT NULL)");
         // Creates clients table
