@@ -137,14 +137,21 @@ public class Router {
      * @return True on success
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    private boolean registerClient(@RequestParam String username, @RequestParam String password,
-                                   @RequestParam String name, @RequestParam String surname,
-                                   @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                   @RequestParam String telephone) {
+    public String registerClient(@RequestParam String username, @RequestParam String password,
+                                 @RequestParam String name, @RequestParam String surname,
+                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                 @RequestParam String telephone) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
+        String session = Utils.createSession();
+        // TODO: Decide what to do for already authenticated user
+        userSessions.put(session, user);
         if (user != null) {
-            return true;
+            return new JSONObject()
+                    .put("username", user.getUsername())
+                    .put("responsabile", user.getManager())
+                    .put("session", session)
+                    .toString();
         }
-        return false;
+        return null;
     }
 }
