@@ -191,6 +191,7 @@ public class Router {
 
     /**
      * Create products from a json array
+     * FIXME: Not working with test
      *
      * @param body A json string, with a products array
      * @return String ok on success
