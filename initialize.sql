@@ -30,7 +30,6 @@ CREATE TABLE loyalty_cards (
 CREATE TABLE managers (
     id INTEGER PRIMARY KEY,
     badge TEXT NOT NULL,
-    -- TODO: Dati anagrafici
     name TEXT NOT NULL,
     surname TEXT NOT NULL,
     address TEXT NOT NULL,

@@ -15,7 +15,8 @@ class ProductTest {
 
     @Test
     void getProduct() {
-        Product product = Product.getProduct("Product");
+        Product product = Product.getProduct("Product", "Brand", 1, 1, null,
+                1, "Characteristics", 1);
         assertNotNull(product);
         assertEquals(1, product.getId());
         assertEquals("Product", product.getName());
@@ -23,6 +24,7 @@ class ProductTest {
         assertEquals(1, product.getPackageSize());
         assertEquals(1, product.getPrice());
         assertNull(product.getImage());
+        assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
         assertEquals(1, product.getSectionId());
     }

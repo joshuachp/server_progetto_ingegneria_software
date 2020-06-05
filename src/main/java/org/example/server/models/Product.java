@@ -48,7 +48,8 @@ public class Product {
                 statement.setString(7, characteristics);
                 statement.setInt(8, section_id);
                 statement.executeUpdate();
-                return Product.getProduct(name);
+                return Product.getProduct(name, brand, package_size, price, image, availability, characteristics,
+                        section_id);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -56,14 +57,55 @@ public class Product {
         return null;
     }
 
-    // TODO: How to get product, using only name now
-    public static Product getProduct(String name) {
+
+    /**
+     * Get a product having all the information.
+     * NOTE: This isn't unique
+     *
+     * @param name            Name
+     * @param brand           Brand
+     * @param package_size    Package size
+     * @param price           Price
+     * @param image           Image
+     * @param availability    Availability
+     * @param characteristics Characteristics
+     * @param section_id      Section Id
+     * @return The product information, null on error
+     */
+    public static Product getProduct(String name, String brand, Integer package_size, Integer price, String image,
+                                     Integer availability, String characteristics, Integer section_id) {
         Database database = Database.getInstance();
         try {
-            PreparedStatement statement = database.getConnection()
-                    .prepareStatement("SELECT id, name, brand, package_size, price, image, availability, " +
-                            "characteristics, section_id FROM products WHERE name = ?");
-            statement.setString(1, name);
+            PreparedStatement statement;
+            // Use IS NULL if null
+            if (image != null) {
+                statement = database.getConnection()
+                        .prepareStatement("SELECT id, name, brand, package_size, price, image, availability, " +
+                                "characteristics, section_id FROM products WHERE name = ? AND brand = ? AND " +
+                                "package_size " +
+                                "= ? AND price = ? AND image = ? AND availability = ? AND characteristics = ? AND " +
+                                "section_id = ?");
+                statement.setString(1, name);
+                statement.setString(2, brand);
+                statement.setInt(3, package_size);
+                statement.setInt(4, price);
+                statement.setString(5, image);
+                statement.setInt(6, availability);
+                statement.setString(7, characteristics);
+                statement.setInt(8, section_id);
+            } else {
+                statement = database.getConnection().prepareStatement("SELECT id, name, brand, package_size, price, " +
+                        "image, availability, characteristics, section_id FROM products WHERE name = ? AND brand = ? " +
+                        "AND " + "package_size = ? AND price = ? AND image IS NULL AND availability = ? AND " +
+                        "characteristics = ? AND section_id = ?");
+                statement.setString(1, name);
+                statement.setString(2, brand);
+                statement.setInt(3, package_size);
+                statement.setInt(4, price);
+                statement.setInt(5, availability);
+                statement.setString(6, characteristics);
+                statement.setInt(7, section_id);
+            }
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
