@@ -220,10 +220,11 @@ public class Router {
                     }
                     // Create the product
                     // TODO: Should fail if product already exists?
-                    if (Product.createProduct(json.getString("name"), json.getString("brand"), json.getInt(
-                            "package_size"),
-                            json.getInt("price"), json.getString("image"), json.getInt("availability"),
-                            json.getString("characteristics"), section.getId()) == null)
+                    if (Product.createProduct(product.getString("name"), product.getString("brand"),
+                            product.getInt("package_size"), product.getInt("price"),
+                            product.isNull("image") ? null : product.getString("image"),
+                            product.getInt("availability"), product.getString("characteristics"),
+                            section.getId()) == null)
                         System.out.println("Error project not created");
                 }
                 return "OK";
@@ -231,4 +232,5 @@ public class Router {
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
     }
+
 }

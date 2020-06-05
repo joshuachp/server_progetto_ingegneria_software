@@ -1,6 +1,8 @@
 package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
+import org.example.server.models.Product;
+import org.example.server.models.Section;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +61,7 @@ class RouterTest {
 
     @Test
     void createProducts() throws Exception {
+        // No image for null
         JSONObject product = new JSONObject()
                 .put("name", "Name")
                 .put("brand", "Brand")
@@ -69,9 +73,14 @@ class RouterTest {
         JSONObject json = new JSONObject()
                 .accumulate("products", product)
                 .accumulate("products", product);
+        String a = json.toString();
         this.mockMvc.perform(post("/api/product/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json.toString()))
                 .andExpect(status().isOk());
+        Section section = Section.getSection("Section");
+        assertNotNull(section);
+        Product product1 = Product.getProduct("Name", "Brand", 1, 1, null, 1, "Characteristic", section.getId());
+        assertNotNull(product1);
     }
 }
