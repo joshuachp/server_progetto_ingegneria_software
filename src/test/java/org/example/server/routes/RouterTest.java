@@ -62,10 +62,40 @@ class RouterTest {
 
     @Test
     void testAutenticateUserSession() throws Exception {
-        MvcResult result = this.mockMvc.perform(post("/api/user/autenticate")
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
                 .param("password", "password"))
                 .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/user/session")
+                .param("session", session))
+                .andExpect(status().isOk()).andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("username"));
+        assertTrue(json.has("responsabile"));
+        assertTrue(json.has("session"));
+        assertTrue(json.has("badge"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("surname"));
+        assertTrue(json.has("address"));
+        assertTrue(json.has("cap"));
+        assertTrue(json.has("city"));
+        assertTrue(json.has("telephone"));
+        assertTrue(json.has("role"));
+
+        assertEquals("admin", json.getString("username"));
+        assertTrue(json.getBoolean("responsabile"));
+        assertEquals(session, json.getString("session"));
+        assertEquals("D34DB33F", json.getString("badge"));
+        assertEquals("Name", json.getString("name"));
+        assertEquals("Surname", json.getString("surname"));
+        assertEquals("Via Viale 1", json.getString("address"));
+        assertEquals(3333, json.getInt("cap"));
+        assertEquals("City", json.getString("city"));
+        assertEquals("3334445555", json.getString("telephone"));
+        assertEquals("Admin", json.getString("role"));
     }
 
     @Test

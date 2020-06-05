@@ -94,20 +94,52 @@ public class Router {
 
     /**
      * Autentica un utente with session token.
+     * TODO: session
      *
      * @param session User session
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JSONObject autenticateUser(@RequestParam String session) {
+    public String autenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
-            User user = userSessions.get(session);
-            return new JSONObject()
-                    .put("username", user.getUsername())
-                    .put("responsabile", user.getManager())
-                    .put("session", session);
+            User user = User.getUser(userSessions.get(session).getUsername());
+            if (user != null) {
+                if (user.getManager()) {
+                    Manager manager = Manager.getManager(user.getId());
+                    if (manager != null) {
+                        return new JSONObject()
+                                .put("username", user.getUsername())
+                                .put("responsabile", user.getManager())
+                                .put("session", session)
+                                .put("badge", manager.getBadge())
+                                .put("name", manager.getName())
+                                .put("surname", manager.getSurname())
+                                .put("address", manager.getAddress())
+                                .put("cap", manager.getCap())
+                                .put("city", manager.getCity())
+                                .put("telephone", manager.getTelephone())
+                                .put("role", manager.getRole())
+                                .toString();
+                    }
+                } else {
+                    Client client = Client.getClient(user.getId());
+                    if (client != null) {
+                        return new JSONObject()
+                                .put("username", user.getUsername())
+                                .put("responsabile", user.getManager())
+                                .put("session", session)
+                                .put("name", client.getName())
+                                .put("surname", client.getSurname())
+                                .put("address", client.getAddress())
+                                .put("cap", client.getCap())
+                                .put("city", client.getCity())
+                                .put("telephone", client.getTelephone())
+                                .toString();
+                    }
+                }
+            }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     /**
