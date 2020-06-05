@@ -1,6 +1,5 @@
 package org.example.server.models;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import org.example.server.database.Database;
 import org.json.JSONObject;
 
@@ -198,6 +197,11 @@ public class Product {
         return id;
     }
 
+    /**
+     * Return JSON of product with fields: name, brand, package_size, price, availability, characteristics, section.
+     *
+     * @return JSON of the product
+     */
     public JSONObject toJSON() {
         JSONObject json = new JSONObject()
                 .put("name", this.name)

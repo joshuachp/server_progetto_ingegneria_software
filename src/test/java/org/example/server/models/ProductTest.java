@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.MockDatabase;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -61,5 +62,20 @@ class ProductTest {
             assertEquals("Characteristics", product.getCharacteristics());
             assertEquals("Section", product.getSectionId());
         }
+    }
+
+    @Test
+    void toJSON() {
+        Product product = Product.getProduct("Product", "Brand", 1, 1, null, 1, "Characteristics", "Section");
+        assertNotNull(product);
+        JSONObject json = product.toJSON();
+        assertEquals("Product", json.getString("name"));
+        assertEquals("Brand", json.getString("brand"));
+        assertEquals(1, json.getInt("package_size"));
+        assertEquals(1, json.getInt("price"));
+        assertFalse(json.has("image"));
+        assertEquals(1, json.getInt("availability"));
+        assertEquals("Characteristics", json.getString("characteristics"));
+        assertEquals("Section", json.getString("section"));
     }
 }

@@ -2,6 +2,7 @@ package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
 import org.example.server.models.Product;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -154,12 +155,21 @@ class RouterTest {
 
     @Test
     void getAllProducts() throws Exception {
-        this.mockMvc.perform(post("/api/user/autenticate")
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
                 .param("password", "password"))
-                .andExpect(status().isOk());
-        this.mockMvc.perform(post("/api/product/all").param("session", "session"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/product/all")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("products"));
+        JSONArray products = json.getJSONArray("products");
+        assertEquals(3, products.length());
     }
 
 }
