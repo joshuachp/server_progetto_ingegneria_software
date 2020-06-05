@@ -79,7 +79,7 @@ CREATE TABLE order_item (
 	total INTEGER NOT NULL,
 	order_id INTEGER NOT NULL,
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
-}
+);
 
 
 ------------------------------------------------------------------------------------------------------------------------
