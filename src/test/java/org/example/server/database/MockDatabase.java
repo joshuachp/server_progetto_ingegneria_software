@@ -102,6 +102,10 @@ public class MockDatabase {
         // Add product
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
                 "characteristics, section_id) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1)");
+        statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
+                "characteristics, section_id) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1)");
+        statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
+                "characteristics, section_id) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1)");
         // Execute
         statement.executeBatch();
     }

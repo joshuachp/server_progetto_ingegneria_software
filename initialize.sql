@@ -95,3 +95,13 @@ INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user
 
 INSERT INTO managers (badge, name, surname, address, cap, city, telephone, role, user_id)
     VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1); -- admin
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
+    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1);
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
+    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1);
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
+    VALUES ('Product', 'Brand', 1, 1, 'https://yt3.ggpht.com/a-/AAuE7mADfh3UcYZrm1JiynJ5CQ3I66fjKULGGQLaIQ=s900-mo-c-c0xffffffff-rj-k-no', 1, 'Characteristics', 1);
+
