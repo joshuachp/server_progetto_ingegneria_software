@@ -73,7 +73,6 @@ class RouterTest {
         JSONObject json = new JSONObject()
                 .accumulate("products", product)
                 .accumulate("products", product);
-        String a = json.toString();
         this.mockMvc.perform(post("/api/product/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json.toString()))
