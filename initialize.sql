@@ -67,6 +67,7 @@ CREATE TABLE orders (
 	payment INTEGER NOT NULL,
 	delivery_start INTEGER NOT NULL,
 	delivery_end INTEGER NOT NULL,
+	state INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
