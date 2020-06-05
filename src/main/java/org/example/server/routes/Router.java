@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -52,61 +53,93 @@ public class Router {
         User user = User.getUser(username);
         if (user != null && Utils.checkPassword(password, user.getPassword())) {
             String session = Utils.createSession();
-            // TODO: Decide what to do for already authenticated user
             userSessions.put(session, user);
             // Check responsabile or client
             if (user.getManager()) {
                 Manager manager = Manager.getManager(user.getId());
-                if (manager == null)
-                    return null;
-                return new JSONObject()
-                        .put("username", user.getUsername())
-                        .put("responsabile", user.getManager())
-                        .put("session", session)
-                        .put("badge", manager.getBadge())
-                        .put("name", manager.getName())
-                        .put("surname", manager.getSurname())
-                        .put("address", manager.getAddress())
-                        .put("cap", manager.getCap())
-                        .put("city", manager.getCity())
-                        .put("telephone", manager.getTelephone())
-                        .put("role", manager.getRole())
-                        .toString();
+                if (manager != null) {
+                    return new JSONObject()
+                            .put("username", user.getUsername())
+                            .put("responsabile", user.getManager())
+                            .put("session", session)
+                            .put("badge", manager.getBadge())
+                            .put("name", manager.getName())
+                            .put("surname", manager.getSurname())
+                            .put("address", manager.getAddress())
+                            .put("cap", manager.getCap())
+                            .put("city", manager.getCity())
+                            .put("telephone", manager.getTelephone())
+                            .put("role", manager.getRole())
+                            .toString();
+                }
+            } else {
+                Client client = Client.getClient(user.getId());
+                if (client != null) {
+                    return new JSONObject()
+                            .put("username", user.getUsername())
+                            .put("responsabile", user.getManager())
+                            .put("session", session)
+                            .put("name", client.getName())
+                            .put("surname", client.getSurname())
+                            .put("address", client.getAddress())
+                            .put("cap", client.getCap())
+                            .put("city", client.getCity())
+                            .put("telephone", client.getTelephone())
+                            .toString();
+                }
             }
-            Client client = Client.getClient(user.getId());
-            if (client == null)
-                return null;
-            return new JSONObject()
-                    .put("username", user.getUsername())
-                    .put("responsabile", user.getManager())
-                    .put("session", session)
-                    .put("name", client.getName())
-                    .put("surname", client.getSurname())
-                    .put("address", client.getAddress())
-                    .put("cap", client.getCap())
-                    .put("city", client.getCity())
-                    .put("telephone", client.getTelephone())
-                    .toString();
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     /**
      * Autentica un utente with session token.
+     * TODO: session
      *
      * @param session User session
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JSONObject autenticateUser(@RequestParam String session) {
+    public String autenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
-            User user = userSessions.get(session);
-            return new JSONObject()
-                    .put("username", user.getUsername())
-                    .put("responsabile", user.getManager())
-                    .put("session", session);
+            User user = User.getUser(userSessions.get(session).getUsername());
+            if (user != null) {
+                if (user.getManager()) {
+                    Manager manager = Manager.getManager(user.getId());
+                    if (manager != null) {
+                        return new JSONObject()
+                                .put("username", user.getUsername())
+                                .put("responsabile", user.getManager())
+                                .put("session", session)
+                                .put("badge", manager.getBadge())
+                                .put("name", manager.getName())
+                                .put("surname", manager.getSurname())
+                                .put("address", manager.getAddress())
+                                .put("cap", manager.getCap())
+                                .put("city", manager.getCity())
+                                .put("telephone", manager.getTelephone())
+                                .put("role", manager.getRole())
+                                .toString();
+                    }
+                } else {
+                    Client client = Client.getClient(user.getId());
+                    if (client != null) {
+                        return new JSONObject()
+                                .put("username", user.getUsername())
+                                .put("responsabile", user.getManager())
+                                .put("session", session)
+                                .put("name", client.getName())
+                                .put("surname", client.getSurname())
+                                .put("address", client.getAddress())
+                                .put("cap", client.getCap())
+                                .put("city", client.getCity())
+                                .put("telephone", client.getTelephone())
+                                .toString();
+                    }
+                }
+            }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -215,7 +248,7 @@ public class Router {
                     if (section == null) {
                         section = Section.createSection(sectionName);
                         if (section == null) {
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
                         }
                     }
                     // Create the product
@@ -224,13 +257,31 @@ public class Router {
                             product.getInt("package_size"), product.getInt("price"),
                             product.isNull("image") ? null : product.getString("image"),
                             product.getInt("availability"), product.getString("characteristics"),
-                            section.getId()) == null)
+                            sectionName) == null)
                         System.out.println("Error project not created");
                 }
                 return "OK";
             }
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Get all products, return a json with an array named products.
+     *
+     * @param session User session
+     * @return Json with products array
+     */
+    @PostMapping(value = "/api/product/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAllProducts(@RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        JSONObject json = new JSONObject();
+        List<Product> products = Product.getAll();
+        if (products == null)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        products.forEach(product -> json.accumulate("products", product.toJSON()));
+        return json.toString();
     }
 
 }

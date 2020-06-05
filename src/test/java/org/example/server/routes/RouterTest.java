@@ -2,7 +2,7 @@ package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
 import org.example.server.models.Product;
-import org.example.server.models.Section;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,77 @@ class RouterTest {
     @BeforeEach
     void setUp() {
         MockDatabase.createMockDatabase();
+    }
+
+    @Test
+    void testAutenticateUser() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("username"));
+        assertTrue(json.has("responsabile"));
+        assertTrue(json.has("session"));
+        assertTrue(json.has("badge"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("surname"));
+        assertTrue(json.has("address"));
+        assertTrue(json.has("cap"));
+        assertTrue(json.has("city"));
+        assertTrue(json.has("telephone"));
+        assertTrue(json.has("role"));
+
+        assertEquals("admin", json.getString("username"));
+        assertTrue(json.getBoolean("responsabile"));
+        // Session not verified
+        assertEquals("D34DB33F", json.getString("badge"));
+        assertEquals("Name", json.getString("name"));
+        assertEquals("Surname", json.getString("surname"));
+        assertEquals("Via Viale 1", json.getString("address"));
+        assertEquals(3333, json.getInt("cap"));
+        assertEquals("City", json.getString("city"));
+        assertEquals("3334445555", json.getString("telephone"));
+        assertEquals("Admin", json.getString("role"));
+    }
+
+    @Test
+    void testAutenticateUserSession() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/user/session")
+                .param("session", session))
+                .andExpect(status().isOk()).andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("username"));
+        assertTrue(json.has("responsabile"));
+        assertTrue(json.has("session"));
+        assertTrue(json.has("badge"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("surname"));
+        assertTrue(json.has("address"));
+        assertTrue(json.has("cap"));
+        assertTrue(json.has("city"));
+        assertTrue(json.has("telephone"));
+        assertTrue(json.has("role"));
+
+        assertEquals("admin", json.getString("username"));
+        assertTrue(json.getBoolean("responsabile"));
+        assertEquals(session, json.getString("session"));
+        assertEquals("D34DB33F", json.getString("badge"));
+        assertEquals("Name", json.getString("name"));
+        assertEquals("Surname", json.getString("surname"));
+        assertEquals("Via Viale 1", json.getString("address"));
+        assertEquals(3333, json.getInt("cap"));
+        assertEquals("City", json.getString("city"));
+        assertEquals("3334445555", json.getString("telephone"));
+        assertEquals("Admin", json.getString("role"));
     }
 
     @Test
@@ -77,9 +149,27 @@ class RouterTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json.toString()))
                 .andExpect(status().isOk());
-        Section section = Section.getSection("Section");
-        assertNotNull(section);
-        Product product1 = Product.getProduct("Name", "Brand", 1, 1, null, 1, "Characteristic", section.getId());
+        Product product1 = Product.getProduct("Name", "Brand", 1, 1, null, 1, "Characteristic", "Section");
         assertNotNull(product1);
     }
+
+    @Test
+    void getAllProducts() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/product/all")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("products"));
+        JSONArray products = json.getJSONArray("products");
+        assertEquals(3, products.length());
+    }
+
 }

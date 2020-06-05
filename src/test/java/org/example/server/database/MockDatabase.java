@@ -71,7 +71,7 @@ public class MockDatabase {
         // Create table sections
         statement.addBatch("CREATE TABLE sections (" +
                 "id INTEGER PRIMARY KEY, " +
-                "name TEXT NOT NULL)");
+                "name TEXT NOT NULL UNIQUE)");
         // Create table product
         statement.addBatch("CREATE TABLE products (" +
                 "id INTEGER PRIMARY KEY, " +
@@ -82,8 +82,8 @@ public class MockDatabase {
                 "image TEXT, " +
                 "availability INTEGER NOT NULL DEFAULT 0, " +
                 "characteristics TEXT, " +
-                "section_id INTEGER NOT NULL, " +
-                "FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE ON UPDATE CASCADE); ");
+                "section INTEGER NOT NULL, " +
+                "FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE); ");
         // Create section table
         // Add user responsabile admin:password
         statement.addBatch("INSERT INTO users (username, password, manager) " +
@@ -101,7 +101,11 @@ public class MockDatabase {
         statement.addBatch("INSERT INTO sections(name) VALUES('Section')");
         // Add product
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
-                "characteristics, section_id) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1)");
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
+        statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
+        statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
         // Execute
         statement.executeBatch();
     }
