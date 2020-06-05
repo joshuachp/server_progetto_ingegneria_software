@@ -29,8 +29,6 @@ public class Database {
      * @throws SQLException The connection to the database failed
      */
     private Database() throws SQLException {
-        // TODO: Better handling of the location of the database, for test remember to initialize the database. The
-        //  database should be in the main folder of the program.
         this.connection = DriverManager.getConnection(DATABASE_URL);
     }
 

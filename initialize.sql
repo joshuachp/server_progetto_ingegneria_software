@@ -30,7 +30,6 @@ CREATE TABLE loyalty_cards (
 CREATE TABLE managers (
     id INTEGER PRIMARY KEY,
     badge TEXT NOT NULL,
-    -- TODO: Dati anagrafici
     name TEXT NOT NULL,
     surname TEXT NOT NULL,
     address TEXT NOT NULL,
@@ -67,6 +66,7 @@ CREATE TABLE orders (
 	payment INTEGER NOT NULL,
 	delivery_start INTEGER NOT NULL,
 	delivery_end INTEGER NOT NULL,
+	state INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -79,7 +79,7 @@ CREATE TABLE order_item (
 	total INTEGER NOT NULL,
 	order_id INTEGER NOT NULL,
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
-}
+);
 
 
 ------------------------------------------------------------------------------------------------------------------------

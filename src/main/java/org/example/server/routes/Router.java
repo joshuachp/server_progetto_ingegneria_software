@@ -2,15 +2,17 @@ package org.example.server.routes;
 
 
 import org.example.server.database.Database;
-import org.example.server.models.Client;
-import org.example.server.models.Manager;
-import org.example.server.models.User;
+import org.example.server.models.*;
 import org.example.server.utils.Utils;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -125,6 +127,7 @@ public class Router {
 
     /**
      * Create a new client user
+     * TODO: Tessera
      *
      * @param username  Username
      * @param password  Password
@@ -185,4 +188,49 @@ public class Router {
         }
         return false;
     }
+
+
+    /**
+     * Create products from a json array
+     * FIXME: Not working with test
+     * TODO: Check session
+     *
+     * @param body A json string, with a products array
+     * @return String ok on success
+     */
+    @PostMapping(value = "/api/product/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes =
+            MediaType.APPLICATION_JSON_VALUE)
+    public String createProducts(@RequestBody String body) {
+        JSONObject json = new JSONObject(body);
+        if (json.has("products")) {
+            // Cycle throw the products
+            JSONArray products = json.getJSONArray("products");
+            JSONObject product;
+            if (!products.isEmpty()) {
+                for (int i = 0; i < products.length(); i++) {
+                    product = products.getJSONObject(i);
+                    // Get the section or create it if it doesn't exist
+                    String sectionName = product.getString("section");
+                    Section section = Section.getSection(sectionName);
+                    if (section == null) {
+                        section = Section.createSection(sectionName);
+                        if (section == null) {
+                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
+                        }
+                    }
+                    // Create the product
+                    // TODO: Should fail if product already exists?
+                    if (Product.createProduct(product.getString("name"), product.getString("brand"),
+                            product.getInt("package_size"), product.getInt("price"),
+                            product.isNull("image") ? null : product.getString("image"),
+                            product.getInt("availability"), product.getString("characteristics"),
+                            section.getId()) == null)
+                        System.out.println("Error project not created");
+                }
+                return "OK";
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
+    }
+
 }
