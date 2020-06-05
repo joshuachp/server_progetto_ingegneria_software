@@ -43,7 +43,7 @@ CREATE TABLE managers (
 
 CREATE TABLE sections (
 	id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL
+	name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE products (
@@ -56,8 +56,8 @@ CREATE TABLE products (
     availability INTEGER NOT NULL DEFAULT 0,
     -- TODO: Check more convenient way to use characteristics, maybe another table
     characteristics TEXT,
-    section_id INTEGER NOT NULL,
-	FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE ON UPDATE CASCADE
+    section INTEGER NOT NULL,
+	FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE orders (

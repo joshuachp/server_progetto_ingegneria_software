@@ -18,7 +18,7 @@ class ProductTest {
     @Test
     void getProduct() {
         Product product = Product.getProduct("Product", "Brand", 1, 1, null,
-                1, "Characteristics", 1);
+                1, "Characteristics", "Section");
         assertNotNull(product);
         assertEquals(1, product.getId());
         assertEquals("Product", product.getName());
@@ -28,15 +28,13 @@ class ProductTest {
         assertNull(product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals(1, product.getSectionId());
+        assertEquals("Section", product.getSectionId());
     }
 
     @Test
     void createProduct() {
-        Section section = Section.getSection("Section");
-        assertNotNull(section);
         Product product = Product.createProduct("Test", "Brand", 1, 1, null,
-                1, "Characteristics", section.getId());
+                1, "Characteristics", "Section");
         assertNotNull(product);
         assertEquals("Test", product.getName());
         assertEquals("Brand", product.getBrand());
@@ -45,7 +43,7 @@ class ProductTest {
         assertNull(product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals(section.getId(), product.getSectionId());
+        assertEquals("Section", product.getSectionId());
     }
 
     @Test
@@ -61,7 +59,7 @@ class ProductTest {
             assertNull(product.getImage());
             assertEquals(1, product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
-            assertEquals(1, product.getSectionId());
+            assertEquals("Section", product.getSectionId());
         }
     }
 }
