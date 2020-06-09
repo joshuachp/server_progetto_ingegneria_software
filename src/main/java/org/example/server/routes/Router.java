@@ -280,7 +280,7 @@ public class Router {
         List<Product> products = Product.getAll();
         if (products == null)
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        products.forEach(product -> json.accumulate("products", product.toJSON()));
+        products.forEach(product -> json.append("products", product.toJSON()));
         return json.toString();
     }
 
@@ -296,10 +296,10 @@ public class Router {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
-        List<Product> products = Product.getAll();
-        if (products == null)
+        List<Section> sections = Section.getAll();
+        if (sections == null)
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        products.forEach(product -> json.accumulate("products", product.toJSON()));
+        sections.forEach(section -> json.append("sections", section.getName()));
         return json.toString();
     }
 

@@ -193,8 +193,8 @@ class RouterTest {
                 .andExpect(status().isOk())
                 .andReturn();
         json = new JSONObject(result.getResponse().getContentAsString());
-        assertTrue(json.has("products"));
-        JSONArray products = json.getJSONArray("products");
-        assertEquals(1, products.length());
+        assertTrue(json.has("sections"));
+        JSONArray sections = json.getJSONArray("sections");
+        assertEquals(1, sections.length());
     }
 }
