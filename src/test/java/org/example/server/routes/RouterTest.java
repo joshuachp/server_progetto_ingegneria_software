@@ -133,6 +133,12 @@ class RouterTest {
 
     @Test
     void createProducts() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject user = new JSONObject(result.getResponse().getContentAsString());
         // No image for null
         JSONObject product = new JSONObject()
                 .put("name", "Name")
@@ -144,7 +150,8 @@ class RouterTest {
                 .put("section", "Section");
         JSONObject json = new JSONObject()
                 .accumulate("products", product)
-                .accumulate("products", product);
+                .accumulate("products", product)
+                .put("session", user.get("session"));
         this.mockMvc.perform(post("/api/product/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json.toString()))

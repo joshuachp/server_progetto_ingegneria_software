@@ -212,7 +212,6 @@ public class Router {
                                    @RequestParam String telephone, @RequestParam String role) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
-        // TODO: Decide what to do for already authenticated user
         userSessions.put(session, user);
         if (user != null) {
             Manager manager = Manager.createManager(badge, username, surname, address, cap, city, telephone, role,
@@ -225,8 +224,6 @@ public class Router {
 
     /**
      * Create products from a json array
-     * FIXME: Not working with test
-     * TODO: Check session
      *
      * @param body A json string, with a products array
      * @return String ok on success
@@ -234,7 +231,10 @@ public class Router {
     @PostMapping(value = "/api/product/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes =
             MediaType.APPLICATION_JSON_VALUE)
     public String createProducts(@RequestBody String body) {
+        // Check session
         JSONObject json = new JSONObject(body);
+        if (!json.has("session") || !userSessions.containsKey(json.getString("session")))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         if (json.has("products")) {
             // Cycle throw the products
             JSONArray products = json.getJSONArray("products");
