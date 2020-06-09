@@ -179,4 +179,22 @@ class RouterTest {
         assertEquals(3, products.length());
     }
 
+    @Test
+    void getAllSections() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/section/all")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("products"));
+        JSONArray products = json.getJSONArray("products");
+        assertEquals(1, products.length());
+    }
 }

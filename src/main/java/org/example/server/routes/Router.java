@@ -284,4 +284,23 @@ public class Router {
         return json.toString();
     }
 
+    /**
+     * Get all sections return a json with an array named sections.
+     * TODO
+     *
+     * @param session User session
+     * @return Json with products array
+     */
+    @PostMapping(value = "/api/section/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAllSections(@RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        JSONObject json = new JSONObject();
+        List<Product> products = Product.getAll();
+        if (products == null)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        products.forEach(product -> json.accumulate("products", product.toJSON()));
+        return json.toString();
+    }
+
 }
