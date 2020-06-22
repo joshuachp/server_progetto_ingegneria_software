@@ -94,7 +94,6 @@ public class Router {
 
     /**
      * Autentica un utente with session token.
-     * TODO: session
      *
      * @param session User session
      * @return Return JSONObject of user data
@@ -162,32 +161,34 @@ public class Router {
      * Create a new client user
      * TODO: Tessera
      *
-     * @param username  Username
-     * @param password  Password
-     * @param name      Name
-     * @param surname   Surname
-     * @param address   Address
-     * @param cap       CAP
-     * @param city      City
-     * @param telephone Telephone
-     * @param payment   Payment
+     * @param username    Username
+     * @param password    Password
+     * @param name        Name
+     * @param surname     Surname
+     * @param address     Address
+     * @param cap         CAP
+     * @param city        City
+     * @param telephone   Telephone
+     * @param payment     Payment
+     * @param card_number Number of the loyalty card can be null
      * @return True on success
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean registerClient(@RequestParam String username, @RequestParam String password,
-                                  @RequestParam String name, @RequestParam String surname,
-                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                  @RequestParam String telephone, @RequestParam Integer payment) {
+    public String registerClient(@RequestParam String username, @RequestParam String password,
+                                 @RequestParam String name, @RequestParam String surname,
+                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                 @RequestParam String telephone, @RequestParam Integer payment,
+                                 @RequestParam(required = false) Integer card_number) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
-        // TODO: Decide what to do for already authenticated user
         userSessions.put(session, user);
         if (user != null) {
             Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
-                    user.getId());
-            return client != null;
+                    user.getId(), card_number);
+            if (client != null)
+                return "OK";
         }
-        return false;
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -203,22 +204,23 @@ public class Router {
      * @param city      City
      * @param telephone Telephone
      * @param role      Role
-     * @return True on success
+     * @return Ok on success
      */
-    @PostMapping(value = "/api/manager/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean registerManager(@RequestParam String username, @RequestParam String password,
-                                   @RequestParam String badge, @RequestParam String name, @RequestParam String surname
+    @PostMapping(value = "/api/manager/register")
+    public String registerManager(@RequestParam String username, @RequestParam String password,
+                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname
             , @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                   @RequestParam String telephone, @RequestParam String role) {
+                                  @RequestParam String telephone, @RequestParam String role) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         userSessions.put(session, user);
         if (user != null) {
             Manager manager = Manager.createManager(badge, username, surname, address, cap, city, telephone, role,
                     user.getId());
-            return manager != null;
+            if (manager != null)
+                return "OK";
         }
-        return false;
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
@@ -286,7 +288,6 @@ public class Router {
 
     /**
      * Get all sections return a json with an array named sections.
-     * TODO
      *
      * @param session User session
      * @return Json with products array

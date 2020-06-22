@@ -30,6 +30,7 @@ class ClientTest {
         assertEquals("3334445555", client.getTelephone());
         assertEquals(0, client.getPayment());
         assertEquals(2, client.getUserId());
+        assertEquals(1, client.getLoyaltyCardId());
     }
 
     @Test
@@ -37,7 +38,7 @@ class ClientTest {
         User user = User.createUser("test", "test", false);
         assertNotNull(user);
         Client client = Client.createClient("Name", "Surname", "Via Viale 1", 3333,
-                "City", "3334445555", 0, user.getId());
+                "City", "3334445555", 0, user.getId(), 1);
         assertNotNull(client);
         // We don't really know the id
         assertEquals("Name", client.getName());
@@ -48,5 +49,6 @@ class ClientTest {
         assertEquals("3334445555", client.getTelephone());
         assertEquals(0, client.getPayment());
         assertEquals(user.getId(), client.getUserId());
+        assertEquals(1, client.getLoyaltyCardId());
     }
 }

@@ -114,6 +114,21 @@ class RouterTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void registerClientCardNumber() throws Exception {
+        this.mockMvc.perform(post("/api/client/register")
+                .param("username", "test")
+                .param("password", "password")
+                .param("name", "Name")
+                .param("surname", "Surname")
+                .param("address", "Via Viale 1")
+                .param("cap", "3333")
+                .param("city", "City")
+                .param("telephone", "3334445555")
+                .param("payment", "1")
+                .param("card_number", "1234"))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void registerManager() throws Exception {
