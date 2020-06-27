@@ -85,6 +85,8 @@ public class Router {
                             .put("cap", client.getCap())
                             .put("city", client.getCity())
                             .put("telephone", client.getTelephone())
+                            .put("payment", client.getPayment())
+                            .put("loyalty_card_number", client.getLoyaltyCardNumber())
                             .toString();
                 }
             }
@@ -133,6 +135,8 @@ public class Router {
                                 .put("cap", client.getCap())
                                 .put("city", client.getCity())
                                 .put("telephone", client.getTelephone())
+                                .put("payment", client.getPayment())
+                                .put("loyalty_card_number", client.getLoyaltyCardNumber())
                                 .toString();
                     }
                 }
@@ -236,6 +240,9 @@ public class Router {
         String session = Utils.createSession();
         userSessions.put(session, user);
         if (user != null) {
+            if (card_number != null && LoyaltyCard.getLoyaltyCard(card_number) == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loyalty card number not found");
+            }
             Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
                     user.getId(), card_number);
             if (client != null)

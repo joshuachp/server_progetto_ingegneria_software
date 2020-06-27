@@ -66,6 +66,39 @@ class RouterTest {
     }
 
     @Test
+    void testAutenticateUserClient() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("username"));
+        assertTrue(json.has("responsabile"));
+        assertTrue(json.has("session"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("surname"));
+        assertTrue(json.has("address"));
+        assertTrue(json.has("cap"));
+        assertTrue(json.has("city"));
+        assertTrue(json.has("telephone"));
+        assertTrue(json.has("payment"));
+        assertTrue(json.has("loyalty_card_number"));
+
+        assertEquals("guest", json.getString("username"));
+        assertFalse(json.getBoolean("responsabile"));
+        // Session not verified
+        assertEquals("Name", json.getString("name"));
+        assertEquals("Surname", json.getString("surname"));
+        assertEquals("Via Viale 1", json.getString("address"));
+        assertEquals(33333, json.getInt("cap"));
+        assertEquals("City", json.getString("city"));
+        assertEquals("3334445555", json.getString("telephone"));
+        assertEquals(0, json.getInt("payment"));
+        assertEquals(1234, json.getInt("loyalty_card_number"));
+    }
+
+    @Test
     void testAutenticateUserSession() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
@@ -101,6 +134,45 @@ class RouterTest {
         assertEquals("City", json.getString("city"));
         assertEquals("3334445555", json.getString("telephone"));
         assertEquals("Admin", json.getString("role"));
+    }
+
+    @Test
+    void testAutenticateUserSessionClient() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/user/session")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("username"));
+        assertTrue(json.has("responsabile"));
+        assertTrue(json.has("session"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("surname"));
+        assertTrue(json.has("address"));
+        assertTrue(json.has("cap"));
+        assertTrue(json.has("city"));
+        assertTrue(json.has("telephone"));
+        assertTrue(json.has("payment"));
+        assertTrue(json.has("loyalty_card_number"));
+
+        assertEquals("guest", json.getString("username"));
+        assertFalse(json.getBoolean("responsabile"));
+        // Session not verified
+        assertEquals("Name", json.getString("name"));
+        assertEquals("Surname", json.getString("surname"));
+        assertEquals("Via Viale 1", json.getString("address"));
+        assertEquals(33333, json.getInt("cap"));
+        assertEquals("City", json.getString("city"));
+        assertEquals("3334445555", json.getString("telephone"));
+        assertEquals(0, json.getInt("payment"));
+        assertEquals(1234, json.getInt("loyalty_card_number"));
     }
 
     @Test
