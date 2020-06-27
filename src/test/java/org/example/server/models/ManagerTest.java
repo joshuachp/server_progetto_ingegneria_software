@@ -27,7 +27,7 @@ class ManagerTest {
         assertEquals("Name", manager.getName());
         assertEquals("Surname", manager.getSurname());
         assertEquals("Via Viale 1", manager.getAddress());
-        assertEquals(3333, manager.getCap());
+        assertEquals(33333, manager.getCap());
         assertEquals("City", manager.getCity());
         assertEquals("3334445555", manager.getTelephone());
         assertEquals("Admin", manager.getRole());
@@ -38,7 +38,7 @@ class ManagerTest {
     void createManager() {
         User user = User.createUser("test", "test", false);
         assertNotNull(user);
-        Manager manager = Manager.createManager("D34DB33F", "Name", "Surname", "Via Viale 1", 3333,
+        Manager manager = Manager.createManager("D34DB33F", "Name", "Surname", "Via Viale 1", 33333,
                 "City", "3334445555", "Test", user.getId());
         assertNotNull(manager);
         // We don't really know the id
@@ -46,7 +46,7 @@ class ManagerTest {
         assertEquals("Name", manager.getName());
         assertEquals("Surname", manager.getSurname());
         assertEquals("Via Viale 1", manager.getAddress());
-        assertEquals(3333, manager.getCap());
+        assertEquals(33333, manager.getCap());
         assertEquals("City", manager.getCity());
         assertEquals("3334445555", manager.getTelephone());
         assertEquals("Test", manager.getRole());

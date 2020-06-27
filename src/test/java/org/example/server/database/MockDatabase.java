@@ -65,11 +65,12 @@ public class MockDatabase {
                 "cap INT NOT NULL, " +
                 "city TEXT NOT NULL, " +
                 "telephone TEXT NOT NULL, " +
-                "payment INTEGER, " +
+                "payment INTEGER DEFAULT 0 NOT NULL, " +
                 "user_id INTEGER NOT NULL, " +
-                "loyalty_card_id INTEGER , " +
+                "loyalty_card_number INTEGER , " +
                 "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE," +
-                "FOREIGN KEY(loyalty_card_id) REFERENCES loyalty_cards(id) ON DELETE CASCADE ON UPDATE CASCADE)");
+                "FOREIGN KEY(loyalty_card_number) REFERENCES loyalty_cards(card_number) ON DELETE CASCADE ON UPDATE " +
+                "CASCADE)");
         // Create loyalty_cards table
         statement.addBatch(" CREATE TABLE loyalty_cards (" +
                 "id INTEGER PRIMARY KEY, " +
@@ -101,13 +102,14 @@ public class MockDatabase {
                 "VALUES('guest', '$2y$12$34AOvePv2yzpQN9aN0ixD.DGmVUaBjWOLq5PImEo0wCfD3iB89HwK', 0)");
         // Add manager data for admin user
         statement.addBatch("INSERT INTO managers (badge, name, surname, address, cap, city, telephone, role, user_id)" +
-                "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1)");
+                "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 'Admin', 1)");
         // Add loyalty card
         statement.addBatch("INSERT INTO loyalty_cards (card_number, emission_date, points)" +
                 "VALUES (1234, 0, 500)");
         // Add client data for guest user
         statement.addBatch("INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id, " +
-                "loyalty_card_id) VALUES ('Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 0, 2, 1)");
+                "loyalty_card_number) VALUES ('Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 0, 2, " +
+                "1234)");
         // Add section
         statement.addBatch("INSERT INTO sections(name) VALUES('Section')");
         // Add product

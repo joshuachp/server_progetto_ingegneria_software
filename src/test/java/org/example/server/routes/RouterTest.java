@@ -1,7 +1,10 @@
 package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
+import org.example.server.models.Client;
 import org.example.server.models.Product;
+import org.example.server.models.User;
+import org.example.server.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +58,7 @@ class RouterTest {
         assertEquals("Name", json.getString("name"));
         assertEquals("Surname", json.getString("surname"));
         assertEquals("Via Viale 1", json.getString("address"));
-        assertEquals(3333, json.getInt("cap"));
+        assertEquals(33333, json.getInt("cap"));
         assertEquals("City", json.getString("city"));
         assertEquals("3334445555", json.getString("telephone"));
         assertEquals("Admin", json.getString("role"));
@@ -93,7 +96,7 @@ class RouterTest {
         assertEquals("Name", json.getString("name"));
         assertEquals("Surname", json.getString("surname"));
         assertEquals("Via Viale 1", json.getString("address"));
-        assertEquals(3333, json.getInt("cap"));
+        assertEquals(33333, json.getInt("cap"));
         assertEquals("City", json.getString("city"));
         assertEquals("3334445555", json.getString("telephone"));
         assertEquals("Admin", json.getString("role"));
@@ -107,7 +110,7 @@ class RouterTest {
                 .param("name", "Name")
                 .param("surname", "Surname")
                 .param("address", "Via Viale 1")
-                .param("cap", "3333")
+                .param("cap", "33333")
                 .param("city", "City")
                 .param("telephone", "3334445555")
                 .param("payment", "1"))
@@ -122,12 +125,50 @@ class RouterTest {
                 .param("name", "Name")
                 .param("surname", "Surname")
                 .param("address", "Via Viale 1")
-                .param("cap", "3333")
+                .param("cap", "33333")
                 .param("city", "City")
                 .param("telephone", "3334445555")
                 .param("payment", "1")
                 .param("card_number", "1234"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateClient() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject user = new JSONObject(result.getResponse().getContentAsString());
+        this.mockMvc.perform(post("/api/client/update")
+                .param("session", user.getString("session"))
+                .param("password", "Test Password")
+                .param("name", "Test Name")
+                .param("surname", "Test Surname")
+                .param("address", "Test Address")
+                .param("cap", "0")
+                .param("city", "Test City")
+                .param("telephone", "Test Telephone")
+                .param("payment", "1")
+                .param("card_number", "1234"))
+                .andExpect(status().isOk());
+
+        User guest = User.getUser("guest");
+        assertNotNull(guest);
+        assertTrue(Utils.checkPassword("Test Password", guest.getPassword()));
+
+        Client client = Client.getClient(guest.getId());
+        assertNotNull(client);
+
+        assertEquals("Test Name", client.getName());
+        assertEquals("Test Surname", client.getSurname());
+        assertEquals("Test Address", client.getAddress());
+        assertEquals(0, client.getCap());
+        assertEquals("Test City", client.getCity());
+        assertEquals("Test Telephone", client.getTelephone());
+        assertEquals(1, client.getPayment());
+        assertEquals(1234, client.getLoyaltyCardNumber());
     }
 
     @Test
@@ -139,7 +180,7 @@ class RouterTest {
                 .param("name", "Name")
                 .param("surname", "Surname")
                 .param("address", "Via Viale 1")
-                .param("cap", "3333")
+                .param("cap", "33333")
                 .param("city", "City")
                 .param("telephone", "3334445555")
                 .param("role", "Test"))

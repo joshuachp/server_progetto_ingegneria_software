@@ -147,7 +147,7 @@ public class Router {
      * @param session The session to delete
      * @return True for success
      */
-    @PostMapping(value = "/api/user/de-authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/user/de-authenticate")
     private boolean deAuthenticateUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
@@ -156,10 +156,63 @@ public class Router {
         return false;
     }
 
+    /**
+     * Update user information
+     *
+     * @param session     The session to delete
+     * @param password    Password
+     * @param name        Name
+     * @param surname     Surname
+     * @param address     Address
+     * @param cap         CAP
+     * @param city        City
+     * @param telephone   Telephone
+     * @param payment     Payment
+     * @param card_number Number of the loyalty card can be null
+     * @return "OK" on success
+     */
+    @PostMapping(value = "/api/client/update")
+    private String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
+                                @RequestParam String name, @RequestParam String surname, @RequestParam String address,
+                                @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
+                                @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
+        if (userSessions.containsKey(session)) {
+            // If set update user password
+            User user = userSessions.get(session);
+            if (password != null) {
+                user.setPassword(Utils.hashPassword(password));
+                if (!user.updateUser())
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            Client client = Client.getClient(user.getId());
+            if (client != null) {
+                // Set data
+                client.setName(name);
+                client.setSurname(surname);
+                client.setAddress(address);
+                client.setCap(cap);
+                client.setCity(city);
+                client.setTelephone(telephone);
+                client.setPayment(payment);
+                // If set search for loyalty card
+                if (card_number != null) {
+                    if (LoyaltyCard.getLoyaltyCard(card_number) == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loyalty card number not found");
+                    }
+                    client.setLoyaltyCardNumber(card_number);
+                }
+                // Update client
+                if (client.updateClient())
+                    return "OK";
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
 
     /**
      * Create a new client user
-     * TODO: Tessera
      *
      * @param username    Username
      * @param password    Password

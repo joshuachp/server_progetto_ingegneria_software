@@ -70,7 +70,7 @@ public class User {
     }
 
     /**
-     * Aggiorna il database con le informazioni dell'ogetto utente
+     * Update the database with the current user information
      *
      * @return True se aggiornato con successo
      */
