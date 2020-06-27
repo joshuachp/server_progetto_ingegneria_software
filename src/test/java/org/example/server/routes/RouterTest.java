@@ -2,6 +2,7 @@ package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
 import org.example.server.models.Client;
+import org.example.server.models.Manager;
 import org.example.server.models.Product;
 import org.example.server.models.User;
 import org.example.server.utils.Utils;
@@ -185,6 +186,44 @@ class RouterTest {
                 .param("telephone", "3334445555")
                 .param("role", "Test"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateManager() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject user = new JSONObject(result.getResponse().getContentAsString());
+        this.mockMvc.perform(post("/api/manager/update")
+                .param("session", user.getString("session"))
+                .param("password", "Test Password")
+                .param("badge", "Test Badge")
+                .param("name", "Test Name")
+                .param("surname", "Test Surname")
+                .param("address", "Test Address")
+                .param("cap", "0")
+                .param("city", "Test City")
+                .param("telephone", "Test Telephone")
+                .param("role", "Test Role"))
+                .andExpect(status().isOk());
+
+        User admin = User.getUser("admin");
+        assertNotNull(admin);
+        assertTrue(Utils.checkPassword("Test Password", admin.getPassword()));
+
+        Manager manager = Manager.getManager(admin.getId());
+        assertNotNull(manager);
+
+        assertEquals("Test Badge", manager.getBadge());
+        assertEquals("Test Name", manager.getName());
+        assertEquals("Test Surname", manager.getSurname());
+        assertEquals("Test Address", manager.getAddress());
+        assertEquals(0, manager.getCap());
+        assertEquals("Test City", manager.getCity());
+        assertEquals("Test Telephone", manager.getTelephone());
+        assertEquals("Test Role", manager.getRole());
     }
 
     @Test

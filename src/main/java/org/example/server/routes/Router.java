@@ -276,6 +276,53 @@ public class Router {
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Update user information
+     *
+     * @param session   The session to delete
+     * @param password  Password
+     * @param badge     Badge
+     * @param name      Name
+     * @param surname   Surname
+     * @param address   Address
+     * @param cap       CAP
+     * @param city      City
+     * @param telephone Telephone
+     * @param role      Role
+     * @return "OK" on success
+     */
+    @PostMapping(value = "/api/manager/update")
+    private String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
+                                 @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
+                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                 @RequestParam String telephone, @RequestParam String role) {
+        if (userSessions.containsKey(session)) {
+            // If set update user password
+            User user = userSessions.get(session);
+            if (password != null) {
+                user.setPassword(Utils.hashPassword(password));
+                if (!user.updateUser())
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            Manager manager = Manager.getManager(user.getId());
+            if (manager != null) {
+                // Set data
+                manager.setBadge(badge);
+                manager.setName(name);
+                manager.setSurname(surname);
+                manager.setAddress(address);
+                manager.setCap(cap);
+                manager.setCity(city);
+                manager.setTelephone(telephone);
+                manager.setRole(role);
+                // Update manager
+                if (manager.updateManager())
+                    return "OK";
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
 
     /**
      * Create products from a json array

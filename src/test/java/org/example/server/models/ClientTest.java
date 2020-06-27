@@ -52,7 +52,7 @@ class ClientTest {
     }
 
     @Test
-    public void updateUser() {
+    public void updateClient() {
         User user = User.getUser("guest");
         assertNotNull(user);
         Client client = Client.getClient(user.getId());

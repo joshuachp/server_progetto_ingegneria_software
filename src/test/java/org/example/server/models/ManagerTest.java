@@ -4,8 +4,7 @@ import org.example.server.database.MockDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ManagerTest {
 
@@ -51,5 +50,36 @@ class ManagerTest {
         assertEquals("3334445555", manager.getTelephone());
         assertEquals("Test", manager.getRole());
         assertEquals(user.getId(), manager.getUserId());
+    }
+
+    @Test
+    public void updateManager() {
+        User user = User.getUser("admin");
+        assertNotNull(user);
+        Manager manager = Manager.getManager(user.getId());
+        assertNotNull(manager);
+
+        manager.setBadge("Test Badge");
+        manager.setName("Test Name");
+        manager.setSurname("Test Surname");
+        manager.setAddress("Test Address");
+        manager.setCap(0);
+        manager.setCity("Test City");
+        manager.setTelephone("Test Telephone");
+        manager.setRole("Test Role");
+
+        assertTrue(manager.updateManager());
+
+        manager = Manager.getManager(user.getId());
+        assertNotNull(manager);
+
+        assertEquals("Test Badge", manager.getBadge());
+        assertEquals("Test Name", manager.getName());
+        assertEquals("Test Surname", manager.getSurname());
+        assertEquals("Test Address", manager.getAddress());
+        assertEquals(0, manager.getCap());
+        assertEquals("Test City", manager.getCity());
+        assertEquals("Test Telephone", manager.getTelephone());
+        assertEquals("Test Role", manager.getRole());
     }
 }
