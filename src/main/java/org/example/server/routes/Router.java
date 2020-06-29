@@ -90,6 +90,8 @@ public class Router {
                             .toString();
                 }
             }
+            // Found error in some place above
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
@@ -141,6 +143,8 @@ public class Router {
                     }
                 }
             }
+            // Found error in some place above
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
