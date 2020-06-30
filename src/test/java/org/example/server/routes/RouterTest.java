@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.sql.Date;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -363,5 +365,28 @@ class RouterTest {
         assertTrue(json.has("sections"));
         JSONArray sections = json.getJSONArray("sections");
         assertEquals(1, sections.length());
+    }
+
+    @Test
+    void getLoyaltyCard() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/card/1234")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("card_number"));
+        assertTrue(json.has("emission_date"));
+        assertTrue(json.has("points"));
+
+
+        assertEquals(1234, json.getInt("card_number"));
+        assertEquals(new Date(0), new Date(json.getLong("emission_date")));
+        assertEquals(500, json.getInt("points"));
     }
 }
