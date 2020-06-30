@@ -111,7 +111,7 @@ public class User {
         this.password = password;
     }
 
-    public boolean getManager() {
+    public boolean isManager() {
         return manager;
     }
 

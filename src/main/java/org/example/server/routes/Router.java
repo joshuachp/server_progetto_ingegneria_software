@@ -8,10 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
@@ -55,12 +52,12 @@ public class Router {
             String session = Utils.createSession();
             userSessions.put(session, user);
             // Check responsabile or client
-            if (user.getManager()) {
+            if (user.isManager()) {
                 Manager manager = Manager.getManager(user.getId());
                 if (manager != null) {
                     return new JSONObject()
                             .put("username", user.getUsername())
-                            .put("responsabile", user.getManager())
+                            .put("responsabile", user.isManager())
                             .put("session", session)
                             .put("badge", manager.getBadge())
                             .put("name", manager.getName())
@@ -77,7 +74,7 @@ public class Router {
                 if (client != null) {
                     return new JSONObject()
                             .put("username", user.getUsername())
-                            .put("responsabile", user.getManager())
+                            .put("responsabile", user.isManager())
                             .put("session", session)
                             .put("name", client.getName())
                             .put("surname", client.getSurname())
@@ -107,12 +104,12 @@ public class Router {
         if (userSessions.containsKey(session)) {
             User user = User.getUser(userSessions.get(session).getUsername());
             if (user != null) {
-                if (user.getManager()) {
+                if (user.isManager()) {
                     Manager manager = Manager.getManager(user.getId());
                     if (manager != null) {
                         return new JSONObject()
                                 .put("username", user.getUsername())
-                                .put("responsabile", user.getManager())
+                                .put("responsabile", user.isManager())
                                 .put("session", session)
                                 .put("badge", manager.getBadge())
                                 .put("name", manager.getName())
@@ -129,7 +126,7 @@ public class Router {
                     if (client != null) {
                         return new JSONObject()
                                 .put("username", user.getUsername())
-                                .put("responsabile", user.getManager())
+                                .put("responsabile", user.isManager())
                                 .put("session", session)
                                 .put("name", client.getName())
                                 .put("surname", client.getSurname())
@@ -415,4 +412,29 @@ public class Router {
         return json.toString();
     }
 
+    /**
+     * Get the loyalty card
+     *
+     * @param card_number Loyalty card
+     * @param session     User session
+     * @return Loyalty card JSON
+     */
+    @PostMapping(value = "/api/card/{card_number}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getLoyaltyCard(@PathVariable(value = "card_number") Integer card_number,
+                                 @RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        if (user.isManager())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a client");
+        Client client = Client.getClient(user.getId());
+        if (client != null) {
+            if (!client.getLoyaltyCardNumber().equals(card_number))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loyalty card not registered to client");
+            LoyaltyCard card = LoyaltyCard.getLoyaltyCard(card_number);
+            if (card != null)
+                return card.toJSON().toString();
+        }
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -204,6 +204,7 @@ public class Product {
      */
     public JSONObject toJSON() {
         JSONObject json = new JSONObject()
+                .put("id", this.id)
                 .put("name", this.name)
                 .put("brand", this.brand)
                 .put("package_size", this.package_size)

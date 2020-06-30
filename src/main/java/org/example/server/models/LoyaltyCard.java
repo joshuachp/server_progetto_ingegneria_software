@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -63,4 +64,15 @@ public class LoyaltyCard {
     }
 
 
+    /**
+     * Convert the object in to a JSON to send to the client. Includes only the properties needed to the client.
+     *
+     * @return JSON of the card property
+     */
+    public JSONObject toJSON() {
+        return new JSONObject()
+                .put("card_number", this.card_number)
+                .put("emission_date", this.emission_date.getTime())
+                .put("points", this.points);
+    }
 }

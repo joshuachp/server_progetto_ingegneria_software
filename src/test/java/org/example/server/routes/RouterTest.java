@@ -54,7 +54,7 @@ class RouterTest {
 
         assertEquals("admin", json.getString("username"));
         assertTrue(json.getBoolean("responsabile"));
-        // Session not verified
+        assertTrue(json.has("session"));
         assertEquals("D34DB33F", json.getString("badge"));
         assertEquals("Name", json.getString("name"));
         assertEquals("Surname", json.getString("surname"));
@@ -87,7 +87,7 @@ class RouterTest {
 
         assertEquals("guest", json.getString("username"));
         assertFalse(json.getBoolean("responsabile"));
-        // Session not verified
+        assertTrue(json.has("session"));
         assertEquals("Name", json.getString("name"));
         assertEquals("Surname", json.getString("surname"));
         assertEquals("Via Viale 1", json.getString("address"));

@@ -69,6 +69,7 @@ class ProductTest {
         Product product = Product.getProduct("Product", "Brand", 1, 1, null, 1, "Characteristics", "Section");
         assertNotNull(product);
         JSONObject json = product.toJSON();
+        assertTrue(json.has("id"));
         assertEquals("Product", json.getString("name"));
         assertEquals("Brand", json.getString("brand"));
         assertEquals(1, json.getInt("package_size"));
