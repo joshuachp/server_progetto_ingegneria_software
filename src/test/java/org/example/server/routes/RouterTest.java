@@ -35,7 +35,7 @@ class RouterTest {
     }
 
     @Test
-    void testAutenticateUser() throws Exception {
+    void authUser() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
                 .param("password", "password"))
@@ -68,7 +68,7 @@ class RouterTest {
     }
 
     @Test
-    void testAutenticateUserClient() throws Exception {
+    void authUserClient() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "guest")
                 .param("password", "guest"))
@@ -101,7 +101,7 @@ class RouterTest {
     }
 
     @Test
-    void testAutenticateUserSession() throws Exception {
+    void authUserSession() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
                 .param("password", "password"))
@@ -139,7 +139,7 @@ class RouterTest {
     }
 
     @Test
-    void testAutenticateUserSessionClient() throws Exception {
+    void authUserSessionClient() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "guest")
                 .param("password", "guest"))
@@ -175,6 +175,30 @@ class RouterTest {
         assertEquals("3334445555", json.getString("telephone"));
         assertEquals(0, json.getInt("payment"));
         assertEquals(1234, json.getInt("loyalty_card_number"));
+    }
+
+    @Test
+    void logoutUser() throws Exception {
+        // Authenticate
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        // Get session
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        String session = json.getString("session");
+        // Logout
+        this.mockMvc.perform(post("/api/user/logout")
+                .param("session", session))
+                .andExpect(status().isOk());
+        // Check if session is invalid
+        this.mockMvc.perform(post("/api/user/session")
+                .param("session", session))
+                .andExpect(status().isUnauthorized());
+        // Check logout with invalid session
+        this.mockMvc.perform(post("/api/user/logout")
+                .param("session", session))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

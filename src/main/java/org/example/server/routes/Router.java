@@ -37,16 +37,14 @@ public class Router {
 
 
     /**
-     * Autentica un utente. Controlla la password con l'hash della password nel
-     * database, se coincidono ritorna una token sessione utente.
+     * Authenticate a user. Check the password with the hash in the database.
      *
      * @param username String User username
      * @param password String User username
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String autenticateUser(@RequestParam String username,
-                                  @RequestParam String password) {
+    public String authUser(@RequestParam String username, @RequestParam String password) {
         User user = User.getUser(username);
         if (user != null && Utils.checkPassword(password, user.getPassword())) {
             String session = Utils.createSession();
@@ -152,13 +150,13 @@ public class Router {
      * @param session The session to delete
      * @return True for success
      */
-    @PostMapping(value = "/api/user/de-authenticate")
-    private boolean deAuthenticateUser(@RequestParam String session) {
+    @PostMapping(value = "/api/user/logout")
+    private String logoutUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
-            return true;
+            return "OK";
         }
-        return false;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -358,17 +356,17 @@ public class Router {
                     if (section == null) {
                         section = Section.createSection(sectionName);
                         if (section == null) {
-                            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                         }
                     }
-                    // Create the product
-                    // TODO: Should fail if product already exists?
+                    // Create the product, this can create a duplicate product with different id but we leve the
+                    // manager to manually control this
                     if (Product.createProduct(product.getString("name"), product.getString("brand"),
                             product.getInt("package_size"), product.getInt("price"),
                             product.isNull("image") ? null : product.getString("image"),
                             product.getInt("availability"), product.getString("characteristics"),
                             sectionName) == null)
-                        System.out.println("Error project not created");
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
                 return "OK";
             }
