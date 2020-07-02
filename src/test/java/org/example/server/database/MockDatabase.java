@@ -118,7 +118,8 @@ public class MockDatabase {
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
                 "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
-                "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/broccoli.jpg', 1, " +
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli" +
+                ".jpg', 1, " +
                 "'Characteristics', 'Section')");
         // Execute
         statement.executeBatch();
