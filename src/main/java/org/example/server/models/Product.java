@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
@@ -37,7 +38,7 @@ public class Product {
     /**
      * @return ArrayList of products, null on error
      */
-    public static ArrayList<Product> getAll() {
+    public static @Nullable ArrayList<Product> getAll() {
         Database database = Database.getInstance();
         ArrayList<Product> list = new ArrayList<>();
         try {
@@ -70,9 +71,9 @@ public class Product {
      * @param section         Section id
      * @return Return the product, null on error
      */
-    public static Product createProduct(String name, String brand, Integer package_size, Integer price, String
+    public static @Nullable Product createProduct(String name, String brand, Integer package_size, Integer price, String
             image,
-                                        Integer availability, String characteristics, String section) {
+                                                  Integer availability, String characteristics, String section) {
         Database database = Database.getInstance();
         if (Section.getSection(name) == null) {
             try {
@@ -112,8 +113,9 @@ public class Product {
      * @param section         Section Id
      * @return The product information, null on error
      */
-    public static Product getProduct(String name, String brand, Integer package_size, Integer price, String image,
-                                     Integer availability, String characteristics, String section) {
+    public static @Nullable Product getProduct(String name, String brand, Integer package_size, Integer price,
+                                               String image,
+                                               Integer availability, String characteristics, String section) {
         Database database = Database.getInstance();
         try {
             PreparedStatement statement;
@@ -149,6 +151,32 @@ public class Product {
                 statement.setString(6, characteristics);
                 statement.setString(7, section);
             }
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                        resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
+                        resultSet.getString(8), resultSet.getString(9));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
+     * Get a product in hte database throw its id.
+     *
+     * @param id The product id in the database
+     * @return Product information or null on erro
+     */
+    public static @Nullable Product getProduct(Integer id) {
+        Database database = Database.getInstance();
+        try {
+            PreparedStatement statement = database.getConnection()
+                    .prepareStatement("SELECT id, name, brand, package_size, price, image, availability, " +
+                            "characteristics, section FROM products WHERE id = ?");
+            statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),

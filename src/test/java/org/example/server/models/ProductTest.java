@@ -18,6 +18,7 @@ class ProductTest {
 
     @Test
     void getProduct() {
+        // Image null
         Product product = Product.getProduct("Product", "Brand", 1, 1, null,
                 1, "Characteristics", "Section");
         assertNotNull(product);
@@ -30,6 +31,37 @@ class ProductTest {
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
         assertEquals("Section", product.getSectionId());
+        // Image not null
+        product = Product.getProduct("Product", "Brand", 1, 1,
+                "http://localhost:8080/broccoli.jpg", 1, "Characteristics",
+                "Section");
+        assertNotNull(product);
+        assertEquals(3, product.getId());
+        assertEquals("Product", product.getName());
+        assertEquals("Brand", product.getBrand());
+        assertEquals(1, product.getPackageSize());
+        assertEquals(1, product.getPrice());
+        assertEquals("http://localhost:8080/broccoli.jpg", product.getImage());
+        assertEquals(1, product.getAvailability());
+        assertEquals("Characteristics", product.getCharacteristics());
+    }
+
+    @Test
+    void getProductById() {
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals(1, product.getId());
+        assertEquals("Product", product.getName());
+        assertEquals("Brand", product.getBrand());
+        assertEquals(1, product.getPackageSize());
+        assertEquals(1, product.getPrice());
+        assertNull(product.getImage());
+        assertEquals(1, product.getAvailability());
+        assertEquals("Characteristics", product.getCharacteristics());
+        assertEquals("Section", product.getSectionId());
+        // Error
+        product = Product.getProduct(42);
+        assertNull(product);
     }
 
     @Test
@@ -57,7 +89,8 @@ class ProductTest {
             assertEquals("Brand", product.getBrand());
             assertEquals(1, product.getPackageSize());
             assertEquals(1, product.getPrice());
-            assertNull(product.getImage());
+            if (product.getImage() != null)
+                assertEquals("http://localhost:8080/broccoli.jpg", product.getImage());
             assertEquals(1, product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
             assertEquals("Section", product.getSectionId());
@@ -66,15 +99,24 @@ class ProductTest {
 
     @Test
     void toJSON() {
-        Product product = Product.getProduct("Product", "Brand", 1, 1, null, 1, "Characteristics", "Section");
+        Product product = Product.getProduct(1);
         assertNotNull(product);
         JSONObject json = product.toJSON();
         assertTrue(json.has("id"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("brand"));
+        assertTrue(json.has("package_size"));
+        assertTrue(json.has("price"));
+        assertFalse(json.has("image"));
+        assertTrue(json.has("availability"));
+        assertTrue(json.has("characteristics"));
+        assertTrue(json.has("section"));
+
+        assertEquals(1, json.getInt("id"));
         assertEquals("Product", json.getString("name"));
         assertEquals("Brand", json.getString("brand"));
         assertEquals(1, json.getInt("package_size"));
         assertEquals(1, json.getInt("price"));
-        assertFalse(json.has("image"));
         assertEquals(1, json.getInt("availability"));
         assertEquals("Characteristics", json.getString("characteristics"));
         assertEquals("Section", json.getString("section"));

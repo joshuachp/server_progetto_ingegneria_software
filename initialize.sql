@@ -107,5 +107,5 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
     VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, 'https://yt3.ggpht.com/a-/AAuE7mADfh3UcYZrm1JiynJ5CQ3I66fjKULGGQLaIQ=s900-mo-c-c0xffffffff-rj-k-no', 1, 'Characteristics', "Section");
+    VALUES ('Product', 'Brand', 1, 1, 'http://localhost:8080/broccoli.jpg', 1, 'Characteristics', "Section");
 

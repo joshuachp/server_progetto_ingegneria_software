@@ -373,6 +373,53 @@ class RouterTest {
     }
 
     @Test
+    void getProduct() throws Exception {
+        // Auth
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        // Get product id 1
+        result = this.mockMvc.perform(post("/api/product/1")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+
+        assertTrue(json.has("id"));
+        assertTrue(json.has("name"));
+        assertTrue(json.has("brand"));
+        assertTrue(json.has("package_size"));
+        assertTrue(json.has("price"));
+        assertFalse(json.has("image"));
+        assertTrue(json.has("availability"));
+        assertTrue(json.has("characteristics"));
+        assertTrue(json.has("section"));
+
+        assertEquals(1, json.getInt("id"));
+        assertEquals("Product", json.getString("name"));
+        assertEquals("Brand", json.getString("brand"));
+        assertEquals(1, json.getInt("package_size"));
+        assertEquals(1, json.getInt("price"));
+        assertEquals(1, json.getInt("availability"));
+        assertEquals("Characteristics", json.getString("characteristics"));
+        assertEquals("Section", json.getString("section"));
+
+        // Error session
+        this.mockMvc.perform(post("/api/product/1")
+                .param("session", "test"))
+                .andExpect(status().isUnauthorized());
+        // Error product id
+        this.mockMvc.perform(post("/api/product/42")
+                .param("session", session))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     void getAllSections() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")

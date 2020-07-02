@@ -393,6 +393,23 @@ public class Router {
     }
 
     /**
+     * Get a product with a specific id, return a json with an array named products.
+     *
+     * @param id      Product id
+     * @param session User session
+     * @return Json with products array
+     */
+    @PostMapping(value = "/api/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getProduct(@PathVariable(value = "id") Integer id, @RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        Product product = Product.getProduct(id);
+        if (product == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        return product.toJSON().toString();
+    }
+
+    /**
      * Get all sections return a json with an array named sections.
      *
      * @param session User session
