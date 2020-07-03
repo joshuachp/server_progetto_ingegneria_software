@@ -8,15 +8,15 @@ import java.sql.SQLException;
 
 public class Manager {
     private final Integer id;
-    private final String badge;
-    private final String name;
-    private final String surname;
-    private final String address;
-    private final Integer cap;
-    private final String city;
-    private final String telephone;
-    private final String role;
     private final Integer user_id;
+    private String badge;
+    private String name;
+    private String surname;
+    private String address;
+    private Integer cap;
+    private String city;
+    private String telephone;
+    private String role;
 
     public Manager(Integer id, String badge, String name, String surname, String address, Integer cap, String city,
                    String telephone, String role, Integer user_id) {
@@ -56,7 +56,6 @@ public class Manager {
         }
         return null;
     }
-
 
     /**
      * Create a new manager
@@ -99,6 +98,34 @@ public class Manager {
         return null;
     }
 
+    /**
+     * Update the database with the current manager information
+     *
+     * @return True se aggiornato con successo
+     */
+    public boolean updateManager() {
+        Database database = Database.getInstance();
+        try {
+            PreparedStatement statement = database.getConnection()
+                    .prepareStatement("UPDATE managers SET badge = ?, name = ?, surname = ?, address = ?, cap = ?, " +
+                            "city = ?, telephone = ?, role = ? WHERE id = ?");
+            statement.setString(1, this.badge);
+            statement.setString(2, this.name);
+            statement.setString(3, this.surname);
+            statement.setString(4, this.address);
+            statement.setInt(5, this.cap);
+            statement.setString(6, this.city);
+            statement.setString(7, this.telephone);
+            statement.setString(8, this.role);
+            statement.setInt(9, this.id);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -107,32 +134,64 @@ public class Manager {
         return badge;
     }
 
+    public void setBadge(String badge) {
+        this.badge = badge;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSurname() {
         return surname;
     }
 
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
     public String getAddress() {
         return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Integer getCap() {
         return cap;
     }
 
+    public void setCap(Integer cap) {
+        this.cap = cap;
+    }
+
     public String getCity() {
         return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getTelephone() {
         return telephone;
     }
 
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
     public String getRole() {
         return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Integer getUserId() {

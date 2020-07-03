@@ -24,10 +24,10 @@ public class User {
     }
 
     /**
-     * Cerca un utente con l'username dato e ne ritorna le informazioni
+     * Select a user with the given username and returns the information
      *
-     * @param username Username da cercare
-     * @return Informazioni dell'utente o null se non trovato
+     * @param username Username in the database
+     * @return User instance or null on error
      */
     public static User getUser(String username) {
         Database database = Database.getInstance();
@@ -70,7 +70,7 @@ public class User {
     }
 
     /**
-     * Aggiorna il database con le informazioni dell'ogetto utente
+     * Update the database with the current user information
      *
      * @return True se aggiornato con successo
      */
@@ -111,7 +111,7 @@ public class User {
         this.password = password;
     }
 
-    public boolean getManager() {
+    public boolean isManager() {
         return manager;
     }
 

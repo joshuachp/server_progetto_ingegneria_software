@@ -26,7 +26,7 @@ public class UserTest {
         assertEquals(1, user.getId());
         assertEquals("admin", user.getUsername());
         assertEquals("$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS", user.getPassword());
-        assertTrue(user.getManager());
+        assertTrue(user.isManager());
     }
 
     /**
@@ -44,7 +44,7 @@ public class UserTest {
         assertNotNull(user);
         assertEquals("username", user.getUsername());
         assertEquals("password", user.getPassword());
-        assertFalse(user.getManager());
+        assertFalse(user.isManager());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class UserTest {
         assertNotNull(user);
         assertEquals("test", user.getUsername());
         assertEquals("test", user.getPassword());
-        assertTrue(user.getManager());
+        assertTrue(user.isManager());
     }
 
     @Test

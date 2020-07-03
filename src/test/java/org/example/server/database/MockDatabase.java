@@ -21,6 +21,7 @@ public class MockDatabase {
         Database database = Database.getInstance();
         try {
             // Si connette in un database in memoria (":memory:") non su file
+            @SuppressWarnings("SpellCheckingInspection")
             Connection connection = DriverManager.getConnection("jdbc:sqlite::memory:");
             database.setConnection(connection);
             setUpDatabase(connection);
@@ -43,18 +44,6 @@ public class MockDatabase {
                 "username TEXT UNIQUE NOT NULL, " +
                 "password TEXT NOT NULL, " +
                 "manager BOOLEAN NOT NULL)");
-        // Creates clients table
-        statement.addBatch("CREATE TABLE clients (" +
-                "id INTEGER PRIMARY KEY, " +
-                "name TEXT NOT NULL, " +
-                "surname TEXT NOT NULL, " +
-                "address TEXT NOT NULL, " +
-                "cap INT NOT NULL, " +
-                "city TEXT NOT NULL, " +
-                "telephone TEXT NOT NULL, " +
-                "payment INTEGER, " +
-                "user_id INTEGER NOT NULL, " +
-                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Create manager table
         statement.addBatch("CREATE TABLE managers (" +
                 "id INTEGER PRIMARY KEY, " +
@@ -68,6 +57,27 @@ public class MockDatabase {
                 "role TEXT NOT NULL, " +
                 "user_id INTEGER NOT NULL, " +
                 "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE)");
+        // Creates clients table
+        statement.addBatch("CREATE TABLE clients (" +
+                "id INTEGER PRIMARY KEY, " +
+                "name TEXT NOT NULL, " +
+                "surname TEXT NOT NULL, " +
+                "address TEXT NOT NULL, " +
+                "cap INT NOT NULL, " +
+                "city TEXT NOT NULL, " +
+                "telephone TEXT NOT NULL, " +
+                "payment INTEGER DEFAULT 0 NOT NULL, " +
+                "user_id INTEGER NOT NULL, " +
+                "loyalty_card_number INTEGER , " +
+                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE," +
+                "FOREIGN KEY(loyalty_card_number) REFERENCES loyalty_cards(card_number) ON DELETE CASCADE ON UPDATE " +
+                "CASCADE)");
+        // Create loyalty_cards table
+        statement.addBatch(" CREATE TABLE loyalty_cards (" +
+                "id INTEGER PRIMARY KEY, " +
+                "card_number INTEGER UNIQUE NOT NULL, " +
+                "emission_date INTEGER NOT NULL, " +
+                "points INTEGER NOT NULL)");
         // Create table sections
         statement.addBatch("CREATE TABLE sections (" +
                 "id INTEGER PRIMARY KEY, " +
@@ -83,20 +93,25 @@ public class MockDatabase {
                 "availability INTEGER NOT NULL DEFAULT 0, " +
                 "characteristics TEXT, " +
                 "section INTEGER NOT NULL, " +
-                "FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE); ");
+                "FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Create section table
         // Add user responsabile admin:password
+        //noinspection SpellCheckingInspection
         statement.addBatch("INSERT INTO users (username, password, manager) " +
                 "VALUES('admin', '$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS', 1)");
         // Add user cliente guest:guest
         statement.addBatch("INSERT INTO users (username, password, manager) " +
                 "VALUES('guest', '$2y$12$34AOvePv2yzpQN9aN0ixD.DGmVUaBjWOLq5PImEo0wCfD3iB89HwK', 0)");
-        // Add client data for guest user
-        statement.addBatch("INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id)" +
-                "VALUES ('Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 0, 2)");
         // Add manager data for admin user
         statement.addBatch("INSERT INTO managers (badge, name, surname, address, cap, city, telephone, role, user_id)" +
-                "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1)");
+                "VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 'Admin', 1)");
+        // Add loyalty card
+        statement.addBatch("INSERT INTO loyalty_cards (card_number, emission_date, points)" +
+                "VALUES (1234, 0, 500)");
+        // Add client data for guest user
+        statement.addBatch("INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id, " +
+                "loyalty_card_number) VALUES ('Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 0, 2, " +
+                "1234)");
         // Add section
         statement.addBatch("INSERT INTO sections(name) VALUES('Section')");
         // Add product
@@ -105,7 +120,9 @@ public class MockDatabase {
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
                 "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
-                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli" +
+                ".jpg', 1, " +
+                "'Characteristics', 'Section')");
         // Execute
         statement.executeBatch();
     }

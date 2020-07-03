@@ -5,6 +5,8 @@ import org.example.server.database.Database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Section {
 
@@ -14,6 +16,25 @@ public class Section {
     public Section(Integer id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    /**
+     * @return ArrayList of products, null on error
+     */
+    public static ArrayList<Section> getAll() {
+        Database database = Database.getInstance();
+        ArrayList<Section> list = new ArrayList<>();
+        try {
+            Statement statement = database.getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT id, name FROM sections");
+            while (resultSet.next()) {
+                list.add(new Section(resultSet.getInt(1), resultSet.getString(2)));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

@@ -4,8 +4,9 @@ import org.example.server.database.MockDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class SectionTest {
@@ -29,5 +30,15 @@ class SectionTest {
         Section section = Section.createSection("Test");
         assertNotNull(section);
         assertEquals("Test", section.getName());
+    }
+
+    @Test
+    void getAll() {
+        List<Section> sections = Section.getAll();
+        assertNotNull(sections);
+        for (Section section : sections) {
+            assertNotNull(section);
+            assertEquals("Section", section.getName());
+        }
     }
 }

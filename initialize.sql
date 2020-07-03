@@ -13,18 +13,18 @@ CREATE TABLE clients (
     cap INT NOT NULL,
     city TEXT NOT NULL,
     telephone TEXT NOT NULL,
-    payment INTEGER,
+    payment INTEGER DEFAULT 0 NOT NULL,
     user_id INTEGER NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+    loyalty_card_number INTEGER,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(loyalty_card_number) REFERENCES loyalty_cards(card_number) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE loyalty_cards (
 	id INTEGER PRIMARY KEY,
-	card_number INTEGER NOT NULL,
+	card_number INTEGER UNIQUE NOT NULL,
 	emission_date INTEGER NOT NULL,
-	points INTEGER NOT NULL,
-	client_id INTEGER NOT NULL,
-	FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE CASCADE ON UPDATE CASCADE
+	points INTEGER NOT NULL
 );
 
 CREATE TABLE managers (
@@ -81,7 +81,6 @@ CREATE TABLE order_item (
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
 ------------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO users (username, password, manager)
@@ -90,18 +89,23 @@ INSERT INTO users (username, password, manager)
 INSERT INTO users (username, password, manager)
     VALUES('guest', '$2y$12$34AOvePv2yzpQN9aN0ixD.DGmVUaBjWOLq5PImEo0wCfD3iB89HwK', 0); -- 2:guest:guest
 
-INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id)
-    VALUES('Name', 'Surname', 'Via Viale 1', 3333, 'Città', '3334445555', 0, 2); -- guest
-
 INSERT INTO managers (badge, name, surname, address, cap, city, telephone, role, user_id)
-    VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 3333, 'City', '3334445555', 'Admin', 1); -- admin
+    VALUES ('D34DB33F', 'Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 'Admin', 1); -- admin
 
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1);
+INSERT INTO loyalty_cards (card_number, emission_date, points)
+    VALUES (1234, 0, 500);
 
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 1);
+INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id, loyalty_card_number)
+    VALUES('Name', 'Surname', 'Via Viale 1', 33333, 'Città', '3334445555', 0, 2, 1234); -- guest
 
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section_id)
-    VALUES ('Product', 'Brand', 1, 1, 'https://yt3.ggpht.com/a-/AAuE7mADfh3UcYZrm1JiynJ5CQ3I66fjKULGGQLaIQ=s900-mo-c-c0xffffffff-rj-k-no', 1, 'Characteristics', 1);
+INSERT INTO sections(name) VALUES("Section");
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+    VALUES ('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli.jpg', 1, 'Characteristics', "Section");
 

@@ -1,6 +1,7 @@
 package org.example.server.utils;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import org.jetbrains.annotations.NotNull;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -20,7 +21,7 @@ public class Utils {
      * @param hash     Hash to check
      * @return Match
      */
-    public static boolean checkPassword(String password, String hash) {
+    public static boolean checkPassword(@NotNull String password, @NotNull String hash) {
         return BCrypt.verifyer().verify(password.toCharArray(), hash.toCharArray()).verified;
     }
 
@@ -30,7 +31,7 @@ public class Utils {
      * @param password Password to hash
      * @return Hashed password
      */
-    public static String hashPassword(String password) {
+    public static @NotNull String hashPassword(@NotNull String password) {
         return BCrypt.withDefaults().hashToString(BCRYPT_ROUNDS, password.toCharArray());
     }
 
@@ -44,8 +45,6 @@ public class Utils {
         byte[] bytes = new byte[256];
         random.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
-
     }
-
 
 }
