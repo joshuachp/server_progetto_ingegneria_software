@@ -33,7 +33,7 @@ class ProductTest {
         assertEquals("Section", product.getSectionId());
         // Image not null
         product = Product.getProduct("Product", "Brand", 1, 1,
-                "http://localhost:8080/broccoli.jpg", 1, "Characteristics",
+                "http://localhost:8080/images/broccoli.jpg", 1, "Characteristics",
                 "Section");
         assertNotNull(product);
         assertEquals(3, product.getId());
@@ -41,7 +41,7 @@ class ProductTest {
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
         assertEquals(1, product.getPrice());
-        assertEquals("http://localhost:8080/broccoli.jpg", product.getImage());
+        assertEquals("http://localhost:8080/images/broccoli.jpg", product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
     }
@@ -90,7 +90,7 @@ class ProductTest {
             assertEquals(1, product.getPackageSize());
             assertEquals(1, product.getPrice());
             if (product.getImage() != null)
-                assertEquals("http://localhost:8080/broccoli.jpg", product.getImage());
+                assertEquals("http://localhost:8080/images/broccoli.jpg", product.getImage());
             assertEquals(1, product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
             assertEquals("Section", product.getSectionId());

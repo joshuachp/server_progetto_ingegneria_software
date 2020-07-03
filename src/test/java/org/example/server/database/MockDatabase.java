@@ -21,6 +21,7 @@ public class MockDatabase {
         Database database = Database.getInstance();
         try {
             // Si connette in un database in memoria (":memory:") non su file
+            @SuppressWarnings("SpellCheckingInspection")
             Connection connection = DriverManager.getConnection("jdbc:sqlite::memory:");
             database.setConnection(connection);
             setUpDatabase(connection);
@@ -95,6 +96,7 @@ public class MockDatabase {
                 "FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Create section table
         // Add user responsabile admin:password
+        //noinspection SpellCheckingInspection
         statement.addBatch("INSERT INTO users (username, password, manager) " +
                 "VALUES('admin', '$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS', 1)");
         // Add user cliente guest:guest
