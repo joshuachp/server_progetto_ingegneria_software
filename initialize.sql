@@ -101,7 +101,7 @@ INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user
 INSERT INTO sections(name) VALUES("Section");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
+    VALUES ('Product', 'Brand', 1, 1,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', "Section");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Product', 'Brand', 1, 1, NULL, 0, 'Characteristics', "Section");
