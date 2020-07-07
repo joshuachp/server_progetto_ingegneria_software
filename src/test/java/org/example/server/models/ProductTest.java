@@ -18,30 +18,30 @@ class ProductTest {
 
     @Test
     void getProduct() {
-        // Image null
-        Product product = Product.getProduct("Product", "Brand", 1, 1, null,
-                1, "Characteristics", "Section");
+        // Image not null
+        Product product = Product.getProduct("Product", "Brand", 1, 1, "http://localhost:8080/images/mascara.jpg", 1,
+                "Characteristics", "Section 1");
         assertNotNull(product);
         assertEquals(1, product.getId());
         assertEquals("Product", product.getName());
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
         assertEquals(1, product.getPrice());
-        assertNull(product.getImage());
+        assertEquals("http://localhost:8080/images/mascara.jpg", product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals("Section", product.getSectionId());
-        // Image not null
+        assertEquals("Section 1", product.getSection());
+        // Image null
         product = Product.getProduct("Product", "Brand", 1, 1,
-                "http://localhost:8080/images/broccoli.jpg", 1, "Characteristics",
-                "Section");
+                null, 1, "Characteristics",
+                "Section 1");
         assertNotNull(product);
-        assertEquals(3, product.getId());
+        assertEquals(2, product.getId());
         assertEquals("Product", product.getName());
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
         assertEquals(1, product.getPrice());
-        assertEquals("http://localhost:8080/images/broccoli.jpg", product.getImage());
+        assertNull(product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
     }
@@ -55,10 +55,10 @@ class ProductTest {
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
         assertEquals(1, product.getPrice());
-        assertNull(product.getImage());
+        assertEquals("http://localhost:8080/images/mascara.jpg", product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals("Section", product.getSectionId());
+        assertEquals("Section 1", product.getSection());
         // Error
         product = Product.getProduct(42);
         assertNull(product);
@@ -76,7 +76,7 @@ class ProductTest {
         assertNull(product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals("Section", product.getSectionId());
+        assertEquals("Section", product.getSection());
     }
 
     @Test
@@ -90,10 +90,11 @@ class ProductTest {
             assertEquals(1, product.getPackageSize());
             assertEquals(1, product.getPrice());
             if (product.getImage() != null)
-                assertEquals("http://localhost:8080/images/broccoli.jpg", product.getImage());
+                assertTrue(product.getImage().equals("http://localhost:8080/images/broccoli.jpg") ||
+                        product.getImage().equals("http://localhost:8080/images/mascara.jpg"));
             assertEquals(1, product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
-            assertEquals("Section", product.getSectionId());
+            assertTrue(product.getSection().equals("Section 1") || product.getSection().equals("Section 2"));
         }
     }
 
@@ -107,7 +108,7 @@ class ProductTest {
         assertTrue(json.has("brand"));
         assertTrue(json.has("package_size"));
         assertTrue(json.has("price"));
-        assertFalse(json.has("image"));
+        assertTrue(json.has("image"));
         assertTrue(json.has("availability"));
         assertTrue(json.has("characteristics"));
         assertTrue(json.has("section"));
@@ -117,8 +118,9 @@ class ProductTest {
         assertEquals("Brand", json.getString("brand"));
         assertEquals(1, json.getInt("package_size"));
         assertEquals(1, json.getInt("price"));
+        assertEquals("http://localhost:8080/images/mascara.jpg", json.getString("image"));
         assertEquals(1, json.getInt("availability"));
         assertEquals("Characteristics", json.getString("characteristics"));
-        assertEquals("Section", json.getString("section"));
+        assertEquals("Section 1", json.getString("section"));
     }
 }

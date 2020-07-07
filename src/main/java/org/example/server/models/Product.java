@@ -40,11 +40,12 @@ public class Product {
      */
     public static @Nullable ArrayList<Product> getAll() {
         Database database = Database.getInstance();
-        ArrayList<Product> list = new ArrayList<>();
         try {
             Statement statement = database.getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT id, name, brand, " +
                     "package_size, price, image, availability, characteristics, section FROM products");
+            // Get length of result set for generating the array list
+            ArrayList<Product> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
                         resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
@@ -217,7 +218,7 @@ public class Product {
         return characteristics;
     }
 
-    public String getSectionId() {
+    public String getSection() {
         return section;
     }
 

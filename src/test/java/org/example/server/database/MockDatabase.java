@@ -94,7 +94,26 @@ public class MockDatabase {
                 "characteristics TEXT, " +
                 "section INTEGER NOT NULL, " +
                 "FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE)");
-        // Create section table
+        // Create order table
+        statement.addBatch("CREATE TABLE orders (" +
+                "id INTEGER PRIMARY KEY, " +
+                "total INTEGER NOT NULL, " +
+                "payment INTEGER NOT NULL, " +
+                "delivery_start INTEGER NOT NULL, " +
+                "delivery_end INTEGER NOT NULL, " +
+                "state INTEGER NOT NULL, " +
+                "user_id INTEGER NOT NULL, " +
+                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE)");
+        // Create order items table
+        statement.addBatch("CREATE TABLE order_items (" +
+                "id INTEGER PRIMARY KEY, " +
+                "name TEXT NOT NULL, " +
+                "price INTEGER NOT NULL, " +
+                "quantity INTEGER NOT NULL, " +
+                "product_id INTEGER NOT NULL, " +
+                "order_id INTEGER NOT NULL, " +
+                "FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
+                "FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Add user responsabile admin:password
         //noinspection SpellCheckingInspection
         statement.addBatch("INSERT INTO users (username, password, manager) " +
@@ -113,16 +132,25 @@ public class MockDatabase {
                 "loyalty_card_number) VALUES ('Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 0, 2, " +
                 "1234)");
         // Add section
-        statement.addBatch("INSERT INTO sections(name) VALUES('Section')");
+        statement.addBatch("INSERT INTO sections(name) VALUES('Section 1')");
+        statement.addBatch("INSERT INTO sections(name) VALUES('Section 2')");
         // Add product
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
-                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/images/mascara" +
+                ".jpg', 1, 'Characteristics', 'Section 1')");
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
-                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section')");
+                "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section 1')");
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
                 "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli" +
-                ".jpg', 1, " +
-                "'Characteristics', 'Section')");
+                ".jpg', 1, 'Characteristics', 'Section 2')");
+        // Add order
+        statement.addBatch("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id) " +
+                "VALUES (3, 0, 0, 0, 0, 2)");
+        // Add order items
+        statement.addBatch("INSERT INTO order_items(name, price, quantity, product_id, order_id) " +
+                "VALUES('Product', 1, 1, 1, 1)");
+        statement.addBatch("INSERT INTO order_items(name, price, quantity, product_id, order_id) " +
+                "VALUES('Product', 1, 2, 3, 1)");
         // Execute
         statement.executeBatch();
     }

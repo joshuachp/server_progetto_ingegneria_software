@@ -394,7 +394,7 @@ class RouterTest {
         assertTrue(json.has("brand"));
         assertTrue(json.has("package_size"));
         assertTrue(json.has("price"));
-        assertFalse(json.has("image"));
+        assertTrue(json.has("image"));
         assertTrue(json.has("availability"));
         assertTrue(json.has("characteristics"));
         assertTrue(json.has("section"));
@@ -404,9 +404,10 @@ class RouterTest {
         assertEquals("Brand", json.getString("brand"));
         assertEquals(1, json.getInt("package_size"));
         assertEquals(1, json.getInt("price"));
+        assertEquals("http://localhost:8080/images/mascara.jpg", json.get("image"));
         assertEquals(1, json.getInt("availability"));
         assertEquals("Characteristics", json.getString("characteristics"));
-        assertEquals("Section", json.getString("section"));
+        assertEquals("Section 1", json.getString("section"));
 
         // Error session
         this.mockMvc.perform(post("/api/product/1")
@@ -435,7 +436,9 @@ class RouterTest {
         json = new JSONObject(result.getResponse().getContentAsString());
         assertTrue(json.has("sections"));
         JSONArray sections = json.getJSONArray("sections");
-        assertEquals(1, sections.length());
+        assertEquals(2, sections.length());
+        assertEquals("Section 1", sections.get(0));
+        assertEquals("Section 2", sections.get(1));
     }
 
     @Test
