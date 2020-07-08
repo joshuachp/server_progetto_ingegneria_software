@@ -5,8 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,12 +30,11 @@ class OrderItemTest {
     }
 
     @Test
-    void getOrderItems() {
-        AtomicReference<List<OrderItem>> orderItems = new AtomicReference<>();
-        assertDoesNotThrow(() -> orderItems.set(OrderItem.getOrderItems(1)));
-        assertEquals(2, orderItems.get().size());
-        for (int i = 0; i < orderItems.get().size(); i++) {
-            OrderItem item = orderItems.get().get(i);
+    void getOrderItems() throws SQLException {
+        List<OrderItem> orderItems = OrderItem.getOrderItems(1);
+        assertEquals(2, orderItems.size());
+        for (int i = 0; i < orderItems.size(); i++) {
+            OrderItem item = orderItems.get(i);
             assertEquals(i + 1, item.getId());
             assertEquals("Product", item.getName());
             assertEquals(1, item.getPrice());
@@ -42,5 +42,21 @@ class OrderItemTest {
             assertEquals(i + 1, item.getProductId());
             assertEquals(1, item.getOrderId());
         }
+    }
+
+    @Test
+    void createOrderItems() throws SQLException {
+        Order order = Order.getOrder(1);
+        assertNotNull(order);
+        int total = order.getTotal();
+        Map<Integer, Integer> products = new HashMap<>();
+        for (int i = 1; i < 4; i++) {
+            products.put(i, i);
+            total += i;
+        }
+        assertTrue(OrderItem.batchCreateOrderItems(1, products));
+        order = Order.getOrder(1);
+        assertNotNull(order);
+        assertEquals(total, order.getTotal());
     }
 }
