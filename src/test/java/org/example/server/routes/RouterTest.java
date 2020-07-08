@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -498,6 +499,10 @@ class RouterTest {
         assertEquals(0, order.getState());
         assertEquals(2, order.getUserId());
         // Check order items
-        // TODO
+        List<OrderItem> orderItems = OrderItem.getOrderItems(2);
+        for (int i = 0; i < 3; i++) {
+            assertEquals(i + 1, orderItems.get(i).getProductId());
+            assertEquals(i + 1, orderItems.get(i).getQuantity());
+        }
     }
 }
