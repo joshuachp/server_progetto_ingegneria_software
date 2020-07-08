@@ -29,7 +29,7 @@ public class OrderItem {
 
     /**
      * Create an OrderItem, it will save the state of a product at the time of the order. It will update the total of
-     * the specified order the products is in.
+     * the specified order the products is in. Te transaction need to be verified first.
      *
      * @param orderId   ID of the order
      * @param productId ID of the product
@@ -39,25 +39,29 @@ public class OrderItem {
      */
     public static boolean createOrderItem(Integer orderId, Integer productId, Integer quantity) throws SQLException {
         Database database = Database.getInstance();
-        PreparedStatement insertStatement = database.getConnection()
+        PreparedStatement insert = database.getConnection()
                 .prepareStatement("INSERT INTO order_items(name, price, quantity, product_id, order_id) "
                         + "SELECT products.name, products.price, ?, products.id, ? FROM products " +
                         "WHERE products.id = ?");
-        insertStatement.setInt(1, quantity);
-        insertStatement.setInt(2, orderId);
-        insertStatement.setInt(3, productId);
-        PreparedStatement updateStatement = database.getConnection()
+        insert.setInt(1, quantity);
+        insert.setInt(2, orderId);
+        insert.setInt(3, productId);
+        PreparedStatement updateOrder = database.getConnection()
                 .prepareStatement("UPDATE orders SET total = (total + ? * " +
                         "(SELECT products.price FROM products WHERE products.id = ? )) WHERE id = ?");
-        updateStatement.setInt(1, quantity);
-        updateStatement.setInt(2, productId);
-        updateStatement.setInt(3, orderId);
-        return insertStatement.executeUpdate() == 1 && updateStatement.executeUpdate() == 1;
+        updateOrder.setInt(1, quantity);
+        updateOrder.setInt(2, productId);
+        updateOrder.setInt(3, orderId);
+        PreparedStatement updateProduct = database.getConnection()
+                .prepareStatement("UPDATE products SET availability = (availability - ?) WHERE id = ?");
+        updateProduct.setInt(1, quantity);
+        updateProduct.setInt(2, productId);
+        return insert.executeUpdate() == 1 && updateOrder.executeUpdate() == 1 && updateProduct.executeUpdate() == 1;
     }
 
     /**
      * Create a batch of OrderItem, it will save the state of the product at the time of the order. It will update the
-     * total of the specified order the products is in.
+     * total of the specified order the products is in. Te transaction need to be verified first.
      *
      * @param orderId  ID of the order
      * @param products Map of product id and product quantity
@@ -66,28 +70,35 @@ public class OrderItem {
      */
     public static boolean batchCreateOrderItems(Integer orderId, @NotNull Map<Integer, Integer> products) throws SQLException {
         Database database = Database.getInstance();
-        PreparedStatement insertStatement = database.getConnection()
+        PreparedStatement insert = database.getConnection()
                 .prepareStatement("INSERT INTO order_items(name, price, quantity, product_id, order_id) "
                         + "SELECT products.name, products.price, ?, products.id, ? FROM products " +
                         "WHERE products.id = ?");
-        PreparedStatement updateStatement = database.getConnection()
+        PreparedStatement updateOrder = database.getConnection()
                 .prepareStatement("UPDATE orders SET total = (total + ? * " +
                         "(SELECT products.price FROM products WHERE products.id = ? )) WHERE id = ?");
+        PreparedStatement updateProduct = database.getConnection()
+                .prepareStatement("UPDATE products SET availability = (availability - ?) WHERE id = ?");
         for (Integer productId : products.keySet()) {
             // Insert
-            insertStatement.setInt(1, products.get(productId));
-            insertStatement.setInt(2, orderId);
-            insertStatement.setInt(3, productId);
-            insertStatement.addBatch();
-            // Update
-            updateStatement.setInt(1, products.get(productId));
-            updateStatement.setInt(2, productId);
-            updateStatement.setInt(3, orderId);
-            updateStatement.addBatch();
+            insert.setInt(1, products.get(productId));
+            insert.setInt(2, orderId);
+            insert.setInt(3, productId);
+            insert.addBatch();
+            // Order
+            updateOrder.setInt(1, products.get(productId));
+            updateOrder.setInt(2, productId);
+            updateOrder.setInt(3, orderId);
+            updateOrder.addBatch();
+            // Product
+            updateProduct.setInt(1, products.get(productId));
+            updateProduct.setInt(2, productId);
+            updateProduct.addBatch();
         }
         // Check that the changes of both batches are the same as the products size
-        return Arrays.stream(insertStatement.executeBatch()).sum() == products.size() &&
-                Arrays.stream(updateStatement.executeBatch()).sum() == products.size();
+        return Arrays.stream(insert.executeBatch()).sum() == products.size() &&
+                Arrays.stream(updateOrder.executeBatch()).sum() == products.size() &&
+                Arrays.stream(updateProduct.executeBatch()).sum() == products.size();
     }
 
     /**

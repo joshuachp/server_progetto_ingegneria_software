@@ -21,13 +21,17 @@ class OrderItemTest {
 
     @Test
     void createOrderItem() throws SQLException {
+        // Get available product
         Order order = Order.getOrder(1);
         assertNotNull(order);
         int total = order.getTotal();
-        assertTrue(OrderItem.createOrderItem(1, 1, 10));
+        assertTrue(OrderItem.createOrderItem(1, 1, 1));
         order = Order.getOrder(1);
         assertNotNull(order);
-        assertEquals(total + 10, order.getTotal());
+        assertEquals(total + 1, order.getTotal());
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals(0, product.getAvailability());
     }
 
     @Test
@@ -48,15 +52,18 @@ class OrderItemTest {
     @Test
     void createOrderItems() throws SQLException {
         Integer orderId = Order.createOrder(0, new Date(0), new Date(0), 0, 2);
-        int total = 0;
         Map<Integer, Integer> products = new HashMap<>();
-        for (int i = 1; i < 4; i++) {
-            products.put(i, i);
-            total += i;
-        }
+        products.put(1, 1);
+        products.put(3, 2);
         assertTrue(OrderItem.batchCreateOrderItems(orderId, products));
         Order order = Order.getOrder(orderId);
         assertNotNull(order);
-        assertEquals(total, order.getTotal());
+        assertEquals(3, order.getTotal());
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals(0, product.getAvailability());
+        product = Product.getProduct(3);
+        assertNotNull(product);
+        assertEquals(1, product.getAvailability());
     }
 }

@@ -358,9 +358,13 @@ public class Router {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
-        List<Product> products = Product.getAll();
-        if (products == null)
+        List<Product> products;
+        try {
+            products = Product.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         products.forEach(product -> json.append("products", product.toJSON()));
         return json.toString();
     }
@@ -376,7 +380,13 @@ public class Router {
     public String getProduct(@PathVariable(value = "id") Integer id, @RequestParam String session) {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        Product product = Product.getProduct(id);
+        Product product;
+        try {
+            product = Product.getProduct(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         if (product == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return product.toJSON().toString();
@@ -427,8 +437,10 @@ public class Router {
     }
 
     /**
-     * Create a new order for a client
+     * Create a new order for a client. The request should have a JSON as a body and have a session and products
+     * elements. The products is a map of product id and quantity.
      *
+     * @param body JSON body
      * @return "OK" on success
      */
     @PostMapping(value = "/api/order/create", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -446,12 +458,24 @@ public class Router {
         Client client = Client.getClient(user.getId());
         if (client == null)
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // Map product id and quantity
+        Map<Integer, Integer> map = Utils.convertToIntegerMap(json.getJSONObject("products").toMap());
+        // Validate order
+        map.keySet().forEach(id -> {
+            try {
+                Product product = Product.getProduct(id);
+                if (product == null || product.getAvailability() < map.get(id))
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        });
         try {
             // Create order
             Integer orderId = Order.createOrder(client.getPayment(), new Date(json.getLong("deliveryStart")),
                     new Date(json.getLong("deliveryEnd")), 0, user.getId());
-            // Get product map
-            Map<Integer, Integer> map = Utils.convertToIntegerMap(json.getJSONObject("products").toMap());
             // Creates product items
             if (OrderItem.batchCreateOrderItems(orderId, map))
                 return "OK";

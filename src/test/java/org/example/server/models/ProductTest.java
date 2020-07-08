@@ -18,7 +18,7 @@ class ProductTest {
     }
 
     @Test
-    void getProduct() {
+    void getProduct() throws SQLException {
         Product product = Product.getProduct(1);
         assertNotNull(product);
         assertEquals(1, product.getId());
@@ -52,7 +52,7 @@ class ProductTest {
     }
 
     @Test
-    void getAll() {
+    void getAll() throws SQLException {
         List<Product> products = Product.getAll();
         assertNotNull(products);
         for (Product product : products) {
@@ -64,14 +64,14 @@ class ProductTest {
             if (product.getImage() != null)
                 assertTrue(product.getImage().equals("http://localhost:8080/images/broccoli.jpg") ||
                         product.getImage().equals("http://localhost:8080/images/mascara.jpg"));
-            assertEquals(1, product.getAvailability());
+            assertTrue(1 == product.getAvailability() || 3 == product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
             assertTrue(product.getSection().equals("Section 1") || product.getSection().equals("Section 2"));
         }
     }
 
     @Test
-    void toJSON() {
+    void toJSON() throws SQLException {
         Product product = Product.getProduct(1);
         assertNotNull(product);
         JSONObject json = product.toJSON();

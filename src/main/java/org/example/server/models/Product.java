@@ -23,7 +23,6 @@ public class Product {
     private final String characteristics;
     private final String section;
 
-
     public Product(Integer id, String name, String brand, Integer package_size, Integer price, String image,
                    Integer availability, String characteristics, String section) {
         this.id = id;
@@ -38,25 +37,23 @@ public class Product {
     }
 
     /**
+     * Get all the products in the database
+     *
      * @return ArrayList of products, null on error
      */
-    public static @Nullable ArrayList<Product> getAll() {
+    public static @NotNull ArrayList<Product> getAll() throws SQLException {
+        ArrayList<Product> list = new ArrayList<>();
         Database database = Database.getInstance();
-        try {
-            Statement statement = database.getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT id, name, brand, " +
-                    "package_size, price, image, availability, characteristics, section FROM products");
-            ArrayList<Product> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-                        resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
-                        resultSet.getString(8), resultSet.getString(9)));
-            }
-            return list;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Statement statement = database.getConnection().createStatement();
+        ResultSet resultSet = statement
+                .executeQuery("SELECT id, name, brand, package_size, price, image, availability, characteristics, " +
+                        "section FROM products");
+        while (resultSet.next()) {
+            list.add(new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
+                    resultSet.getString(8), resultSet.getString(9)));
         }
-        return null;
+        return list;
     }
 
     /**
@@ -101,21 +98,17 @@ public class Product {
      * @param id The product id in the database
      * @return Product information or null on erro
      */
-    public static @Nullable Product getProduct(Integer id) {
+    public static @Nullable Product getProduct(Integer id) throws SQLException {
         Database database = Database.getInstance();
-        try {
-            PreparedStatement statement = database.getConnection()
-                    .prepareStatement("SELECT id, name, brand, package_size, price, image, availability, " +
-                            "characteristics, section FROM products WHERE id = ?");
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-                        resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
-                        resultSet.getString(8), resultSet.getString(9));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("SELECT id, name, brand, package_size, price, image, availability, " +
+                        "characteristics, section FROM products WHERE id = ?");
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
+                    resultSet.getString(8), resultSet.getString(9));
         }
         return null;
     }

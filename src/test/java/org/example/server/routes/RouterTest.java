@@ -473,12 +473,9 @@ class RouterTest {
         JSONObject json = new JSONObject(result.getResponse().getContentAsString());
         String session = json.getString("session");
         // Request
-        int total = 0;
         Map<Integer, Integer> products = new HashMap<>();
-        for (int i = 1; i < 4; i++) {
-            products.put(i, i);
-            total += i;
-        }
+        products.put(1, 1);
+        products.put(3, 2);
         json = new JSONObject()
                 .put("session", session)
                 .put("products", products)
@@ -492,7 +489,7 @@ class RouterTest {
         // Check order
         Order order = Order.getOrder(2);
         assertNotNull(order);
-        assertEquals(total, order.getTotal());
+        assertEquals(3, order.getTotal());
         assertEquals(0, order.getPayment());
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
@@ -500,9 +497,10 @@ class RouterTest {
         assertEquals(2, order.getUserId());
         // Check order items
         List<OrderItem> orderItems = OrderItem.getOrderItems(2);
-        for (int i = 0; i < 3; i++) {
-            assertEquals(i + 1, orderItems.get(i).getProductId());
-            assertEquals(i + 1, orderItems.get(i).getQuantity());
-        }
+        assertEquals(products.size(), orderItems.size());
+        assertEquals(1, orderItems.get(0).getProductId());
+        assertEquals(1, orderItems.get(0).getQuantity());
+        assertEquals(3, orderItems.get(1).getProductId());
+        assertEquals(2, orderItems.get(1).getQuantity());
     }
 }

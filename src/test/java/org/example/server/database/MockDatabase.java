@@ -142,7 +142,7 @@ public class MockDatabase {
                 "characteristics, section) VALUES('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', 'Section 1')");
         statement.addBatch("INSERT INTO products(name, brand, package_size, price, image, availability, " +
                 "characteristics, section) VALUES('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli" +
-                ".jpg', 1, 'Characteristics', 'Section 2')");
+                ".jpg', 3, 'Characteristics', 'Section 2')");
         // Add order
         statement.addBatch("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id) " +
                 "VALUES (3, 0, 0, 0, 0, 2)");
