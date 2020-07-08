@@ -44,7 +44,6 @@ public class Product {
             Statement statement = database.getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT id, name, brand, " +
                     "package_size, price, image, availability, characteristics, section FROM products");
-            // Get length of result set for generating the array list
             ArrayList<Product> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),

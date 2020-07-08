@@ -1,10 +1,12 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.jetbrains.annotations.Nullable;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 public class Order {
     private final Integer id;
@@ -26,19 +28,42 @@ public class Order {
         this.user_id = user_id;
     }
 
+    /**
+     * Create a new order in the database with the given data
+     *
+     * @param payment        Payment
+     * @param delivery_start Delivery start
+     * @param delivery_end   Delivery end
+     * @param state          State
+     * @param user_id        User id
+     * @return True on success
+     * @throws SQLException On error
+     */
     public static boolean createOrder(Integer payment, Date delivery_start, Date delivery_end, Integer state,
                                       Integer user_id) throws SQLException {
-
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
                 .prepareStatement("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id) "
                         + "VALUES(0, ?, ?, ?, ?, ?)");
         statement.setInt(1, payment);
-        statement.setDate(2, (java.sql.Date) delivery_start);
-        statement.setDate(3, (java.sql.Date) delivery_end);
+        statement.setDate(2, delivery_start);
+        statement.setDate(3, delivery_end);
         statement.setInt(4, state);
         statement.setInt(5, user_id);
         return statement.executeUpdate() == 1;
+    }
+
+    public static @Nullable Order getOrder(Integer id) throws SQLException {
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, user_id " +
+                        "FROM orders WHERE id = ?");
+        statement.setInt(1, id);
+        ResultSet result = statement.executeQuery();
+        if (result.next())
+            return new Order(result.getInt(1), result.getInt(2), result.getInt(3), result.getDate(4),
+                    result.getDate(5), result.getInt(6), result.getInt(7));
+        return null;
     }
 
     public Integer getId() {
@@ -53,11 +78,11 @@ public class Order {
         return payment;
     }
 
-    public Date getDelivery_start() {
+    public Date getDeliveryStart() {
         return delivery_start;
     }
 
-    public Date getDelivery_end() {
+    public Date getDeliveryEnd() {
         return delivery_end;
     }
 
@@ -65,7 +90,7 @@ public class Order {
         return state;
     }
 
-    public Integer getUser_id() {
+    public Integer getUserId() {
         return user_id;
     }
 

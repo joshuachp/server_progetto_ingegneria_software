@@ -150,7 +150,7 @@ public class MockDatabase {
         statement.addBatch("INSERT INTO order_items(name, price, quantity, product_id, order_id) " +
                 "VALUES('Product', 1, 1, 1, 1)");
         statement.addBatch("INSERT INTO order_items(name, price, quantity, product_id, order_id) " +
-                "VALUES('Product', 1, 2, 3, 1)");
+                "VALUES('Product', 1, 2, 2, 1)");
         // Execute
         statement.executeBatch();
     }

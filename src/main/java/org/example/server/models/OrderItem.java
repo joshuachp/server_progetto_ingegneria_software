@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,34 +26,47 @@ public class OrderItem {
     }
 
     /**
-     * Create an OrderItem, it will save the state of a product at the time of the
-     * order.
+     * Create an OrderItem, it will save the state of a product at the time of the order. It will update teh total of
+     * the specified order the products is in.
      *
      * @param productId ID of the product
      * @param orderId   ID of the order
      * @return True on success
+     * @throws SQLException On error
      */
     public static boolean createOrderItem(Integer productId, Integer orderId, Integer quantity) throws SQLException {
         Database database = Database.getInstance();
-        PreparedStatement statement = database.getConnection()
+        PreparedStatement insertStatement = database.getConnection()
                 .prepareStatement("INSERT INTO order_items(name, price, quantity, product_id, order_id) "
                         + "SELECT products.name, products.price, ?, products.id, ? FROM products " +
                         "WHERE products.id = ?");
-        statement.setInt(1, quantity);
-        statement.setInt(2, orderId);
-        statement.setInt(3, productId);
-        return statement.executeUpdate() == 1;
+        insertStatement.setInt(1, quantity);
+        insertStatement.setInt(2, orderId);
+        insertStatement.setInt(3, productId);
+        PreparedStatement updateStatement = database.getConnection()
+                .prepareStatement("UPDATE orders SET total = (total + ? * " +
+                        "(SELECT products.price FROM products WHERE products.id = ? )) WHERE id = ?");
+        updateStatement.setInt(1, quantity);
+        updateStatement.setInt(2, productId);
+        updateStatement.setInt(3, orderId);
+        return insertStatement.executeUpdate() == 1 && updateStatement.executeUpdate() == 1;
 
     }
 
-    public static ArrayList<OrderItem> getOrderItems(Integer orderId) throws SQLException {
+    /**
+     * Returns a list of all the items for a specific order
+     *
+     * @param orderId Id of the order the items are from
+     * @return ArrayList of order items
+     * @throws SQLException On error
+     */
+    public static @NotNull ArrayList<OrderItem> getOrderItems(Integer orderId) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
                 .prepareStatement("SELECT id, name, price, quantity, product_id, order_id FROM order_items " +
                         "WHERE order_id = ?");
         statement.setInt(1, orderId);
         ResultSet resultSet = statement.executeQuery();
-        // Get length of result set for generating the array list
         ArrayList<OrderItem> list = new ArrayList<>();
         while (resultSet.next()) {
             list.add(new OrderItem(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3),
