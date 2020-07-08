@@ -71,13 +71,14 @@ CREATE TABLE orders (
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE order_item (
+CREATE TABLE order_items (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
 	price INTEGER NOT NULL,
 	quantity INTEGER NOT NULL,
-	total INTEGER NOT NULL,
+	product_id INTEGER NOT NULL,
 	order_id INTEGER NOT NULL,
+    FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -98,14 +99,24 @@ INSERT INTO loyalty_cards (card_number, emission_date, points)
 INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id, loyalty_card_number)
     VALUES('Name', 'Surname', 'Via Viale 1', 33333, 'Città', '3334445555', 0, 2, 1234); -- guest
 
-INSERT INTO sections(name) VALUES("Section");
+INSERT INTO sections(name) VALUES("Section 1");
+
+INSERT INTO sections(name) VALUES("Section 2");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
+    VALUES ('Product', 'Brand', 1, 1,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', "Section 1");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 1, 'Characteristics', "Section");
+    VALUES ('Product', 'Brand', 1, 1, NULL, 0, 'Characteristics', "Section 1");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli.jpg', 1, 'Characteristics', "Section");
+    VALUES ('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', "Section 2");
 
+INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id)
+    VALUES (3, 0, 0, 0, 0, 2);
+
+INSERT INTO order_items(name, price, quantity, product_id, order_id)
+    VALUES ("Product", 1, 1, 1, 1);
+
+INSERT INTO order_items(name, price, quantity, product_id, order_id)
+    VALUES ("Product", 1, 2, 2, 1);

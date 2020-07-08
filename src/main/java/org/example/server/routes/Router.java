@@ -1,6 +1,5 @@
 package org.example.server.routes;
 
-
 import org.example.server.database.Database;
 import org.example.server.models.*;
 import org.example.server.utils.Utils;
@@ -11,10 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * Server for database interaction
@@ -23,7 +23,8 @@ import java.util.Map;
 public class Router {
 
     /**
-     * Map of the authenticated users. It's in memory since we don't have a lot of users.
+     * Map of the authenticated users. It's in memory since we don't have a lot of
+     * users.
      */
     private final Map<String, User> userSessions;
 
@@ -34,7 +35,6 @@ public class Router {
         this.userSessions = new HashMap<>();
         Database.getInstance();
     }
-
 
     /**
      * Authenticate a user. Check the password with the hash in the database.
@@ -53,36 +53,21 @@ public class Router {
             if (user.isManager()) {
                 Manager manager = Manager.getManager(user.getId());
                 if (manager != null) {
-                    return new JSONObject()
-                            .put("username", user.getUsername())
-                            .put("responsabile", user.isManager())
-                            .put("session", session)
-                            .put("badge", manager.getBadge())
-                            .put("name", manager.getName())
-                            .put("surname", manager.getSurname())
-                            .put("address", manager.getAddress())
-                            .put("cap", manager.getCap())
-                            .put("city", manager.getCity())
-                            .put("telephone", manager.getTelephone())
-                            .put("role", manager.getRole())
-                            .toString();
+                    return new JSONObject().put("username", user.getUsername()).put("responsabile", user.isManager())
+                            .put("session", session).put("badge", manager.getBadge()).put("name", manager.getName())
+                            .put("surname", manager.getSurname()).put("address", manager.getAddress())
+                            .put("cap", manager.getCap()).put("city", manager.getCity())
+                            .put("telephone", manager.getTelephone()).put("role", manager.getRole()).toString();
                 }
             } else {
                 Client client = Client.getClient(user.getId());
                 if (client != null) {
-                    return new JSONObject()
-                            .put("username", user.getUsername())
-                            .put("responsabile", user.isManager())
-                            .put("session", session)
-                            .put("name", client.getName())
-                            .put("surname", client.getSurname())
-                            .put("address", client.getAddress())
-                            .put("cap", client.getCap())
-                            .put("city", client.getCity())
-                            .put("telephone", client.getTelephone())
+                    return new JSONObject().put("username", user.getUsername()).put("responsabile", user.isManager())
+                            .put("session", session).put("name", client.getName()).put("surname", client.getSurname())
+                            .put("address", client.getAddress()).put("cap", client.getCap())
+                            .put("city", client.getCity()).put("telephone", client.getTelephone())
                             .put("payment", client.getPayment())
-                            .put("loyalty_card_number", client.getLoyaltyCardNumber())
-                            .toString();
+                            .put("loyalty_card_number", client.getLoyaltyCardNumber()).toString();
                 }
             }
             // Found error in some place above
@@ -105,36 +90,23 @@ public class Router {
                 if (user.isManager()) {
                     Manager manager = Manager.getManager(user.getId());
                     if (manager != null) {
-                        return new JSONObject()
-                                .put("username", user.getUsername())
-                                .put("responsabile", user.isManager())
-                                .put("session", session)
-                                .put("badge", manager.getBadge())
-                                .put("name", manager.getName())
-                                .put("surname", manager.getSurname())
-                                .put("address", manager.getAddress())
-                                .put("cap", manager.getCap())
-                                .put("city", manager.getCity())
-                                .put("telephone", manager.getTelephone())
-                                .put("role", manager.getRole())
-                                .toString();
+                        return new JSONObject().put("username", user.getUsername())
+                                .put("responsabile", user.isManager()).put("session", session)
+                                .put("badge", manager.getBadge()).put("name", manager.getName())
+                                .put("surname", manager.getSurname()).put("address", manager.getAddress())
+                                .put("cap", manager.getCap()).put("city", manager.getCity())
+                                .put("telephone", manager.getTelephone()).put("role", manager.getRole()).toString();
                     }
                 } else {
                     Client client = Client.getClient(user.getId());
                     if (client != null) {
-                        return new JSONObject()
-                                .put("username", user.getUsername())
-                                .put("responsabile", user.isManager())
-                                .put("session", session)
-                                .put("name", client.getName())
-                                .put("surname", client.getSurname())
-                                .put("address", client.getAddress())
-                                .put("cap", client.getCap())
-                                .put("city", client.getCity())
-                                .put("telephone", client.getTelephone())
+                        return new JSONObject().put("username", user.getUsername())
+                                .put("responsabile", user.isManager()).put("session", session)
+                                .put("name", client.getName()).put("surname", client.getSurname())
+                                .put("address", client.getAddress()).put("cap", client.getCap())
+                                .put("city", client.getCity()).put("telephone", client.getTelephone())
                                 .put("payment", client.getPayment())
-                                .put("loyalty_card_number", client.getLoyaltyCardNumber())
-                                .toString();
+                                .put("loyalty_card_number", client.getLoyaltyCardNumber()).toString();
                     }
                 }
             }
@@ -213,7 +185,6 @@ public class Router {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-
     /**
      * Create a new client user
      *
@@ -231,10 +202,9 @@ public class Router {
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public String registerClient(@RequestParam String username, @RequestParam String password,
-                                 @RequestParam String name, @RequestParam String surname,
-                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                 @RequestParam String telephone, @RequestParam Integer payment,
-                                 @RequestParam(required = false) Integer card_number) {
+                                 @RequestParam String name, @RequestParam String surname, @RequestParam String address,
+                                 @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
+                                 @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         userSessions.put(session, user);
@@ -242,8 +212,8 @@ public class Router {
             if (card_number != null && LoyaltyCard.getLoyaltyCard(card_number) == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loyalty card number not found");
             }
-            Client client = Client.createClient(username, surname, address, cap, city, telephone, payment,
-                    user.getId(), card_number);
+            Client client = Client.createClient(username, surname, address, cap, city, telephone, payment, user.getId(),
+                    card_number);
             if (client != null)
                 return "OK";
         }
@@ -267,8 +237,8 @@ public class Router {
      */
     @PostMapping(value = "/api/manager/register")
     public String registerManager(@RequestParam String username, @RequestParam String password,
-                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname
-            , @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
+                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
                                   @RequestParam String telephone, @RequestParam String role) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
@@ -359,14 +329,17 @@ public class Router {
                             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                         }
                     }
-                    // Create the product, this can create a duplicate product with different id but we leve the
-                    // manager to manually control this
-                    if (Product.createProduct(product.getString("name"), product.getString("brand"),
-                            product.getInt("package_size"), product.getInt("price"),
-                            product.isNull("image") ? null : product.getString("image"),
-                            product.getInt("availability"), product.getString("characteristics"),
-                            sectionName) == null)
+                    // Create the product, this can create a duplicate product with different id but
+                    // we leve the manager to manually control this
+                    try {
+                        Product.createProduct(product.getString("name"), product.getString("brand"), product.getInt(
+                                "package_size"), product.getInt("price"),
+                                product.isNull("image") ? null : product.getString("image"),
+                                product.getInt("availability"), product.getString("characteristics"), sectionName);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
                 }
                 return "OK";
             }
@@ -385,9 +358,13 @@ public class Router {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
-        List<Product> products = Product.getAll();
-        if (products == null)
+        List<Product> products;
+        try {
+            products = Product.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         products.forEach(product -> json.append("products", product.toJSON()));
         return json.toString();
     }
@@ -403,7 +380,13 @@ public class Router {
     public String getProduct(@PathVariable(value = "id") Integer id, @RequestParam String session) {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        Product product = Product.getProduct(id);
+        Product product;
+        try {
+            product = Product.getProduct(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         if (product == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return product.toJSON().toString();
@@ -449,6 +432,55 @@ public class Router {
             LoyaltyCard card = LoyaltyCard.getLoyaltyCard(card_number);
             if (card != null)
                 return card.toJSON().toString();
+        }
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Create a new order for a client. The request should have a JSON as a body and have a session and products
+     * elements. The products is a map of product id and quantity.
+     *
+     * @param body JSON body
+     * @return "OK" on success
+     */
+    @PostMapping(value = "/api/order/create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String createOrder(@RequestBody String body) {
+        // Checks request body
+        JSONObject json = new JSONObject(body);
+        if (!(json.has("session") && json.has("products") && json.has("deliveryStart") && json.has("deliveryEnd")))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        String session = json.getString("session");
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        if (user.isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        Client client = Client.getClient(user.getId());
+        if (client == null)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // Map product id and quantity
+        Map<Integer, Integer> map = Utils.convertToIntegerMap(json.getJSONObject("products").toMap());
+        // Validate order
+        map.keySet().forEach(id -> {
+            try {
+                Product product = Product.getProduct(id);
+                if (product == null || product.getAvailability() < map.get(id))
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        });
+        try {
+            // Create order
+            Integer orderId = Order.createOrder(client.getPayment(), new Date(json.getLong("deliveryStart")),
+                    new Date(json.getLong("deliveryEnd")), 0, user.getId());
+            // Creates product items
+            if (OrderItem.batchCreateOrderItems(orderId, map))
+                return "OK";
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }

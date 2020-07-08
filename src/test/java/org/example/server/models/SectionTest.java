@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 class SectionTest {
@@ -19,10 +20,10 @@ class SectionTest {
 
     @Test
     void getSection() {
-        Section section = Section.getSection("Section");
+        Section section = Section.getSection("Section 1");
         assertNotNull(section);
         assertEquals(1, section.getId());
-        assertEquals("Section", section.getName());
+        assertEquals("Section 1", section.getName());
     }
 
     @Test
@@ -36,9 +37,8 @@ class SectionTest {
     void getAll() {
         List<Section> sections = Section.getAll();
         assertNotNull(sections);
-        for (Section section : sections) {
-            assertNotNull(section);
-            assertEquals("Section", section.getName());
-        }
+        assertEquals(2, sections.size());
+        assertEquals("Section 1", sections.get(0).getName());
+        assertEquals("Section 2", sections.get(1).getName());
     }
 }
