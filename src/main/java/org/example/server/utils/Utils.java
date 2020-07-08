@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -47,4 +49,18 @@ public class Utils {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    /**
+     * Converts a Map<String, Object> into a Map<Integer,Integer>
+     *
+     * @param map Starting map
+     * @return Converted map
+     */
+    public static Map<Integer, Integer> convertToIntegerMap(Map<String, Object> map) {
+        return map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> Integer.valueOf(entry.getKey()),
+                        entry -> (Integer) entry.getValue()
+                ));
+    }
 }

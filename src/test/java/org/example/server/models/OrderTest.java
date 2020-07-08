@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.sql.Date;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class OrderTest {
 
@@ -18,10 +19,11 @@ class OrderTest {
 
     @Test
     void createOrder() throws SQLException {
-        assertTrue(Order.createOrder(0, new Date(0), new Date(0), 0, 2));
-        Order order = Order.getOrder(2);
+        Integer id = Order.createOrder(0, new Date(0), new Date(0), 0, 2);
+        assertEquals(2, id);
+        Order order = Order.getOrder(id);
         assertNotNull(order);
-        assertEquals(2, order.getId());
+        assertEquals(id, order.getId());
         assertEquals(0, order.getTotal());
         assertEquals(0, order.getPayment());
         assertEquals(new Date(0), order.getDeliveryStart());

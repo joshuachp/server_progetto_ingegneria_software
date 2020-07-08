@@ -47,15 +47,15 @@ class OrderItemTest {
 
     @Test
     void createOrderItems() throws SQLException {
-        assertTrue(Order.createOrder(0, new Date(0), new Date(0), 0, 2));
+        Integer orderId = Order.createOrder(0, new Date(0), new Date(0), 0, 2);
         int total = 0;
         Map<Integer, Integer> products = new HashMap<>();
         for (int i = 1; i < 4; i++) {
             products.put(i, i);
             total += i;
         }
-        assertTrue(OrderItem.batchCreateOrderItems(2, products));
-        Order order = Order.getOrder(2);
+        assertTrue(OrderItem.batchCreateOrderItems(orderId, products));
+        Order order = Order.getOrder(orderId);
         assertNotNull(order);
         assertEquals(total, order.getTotal());
     }

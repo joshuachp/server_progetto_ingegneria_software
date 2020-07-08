@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,36 +19,6 @@ class ProductTest {
 
     @Test
     void getProduct() {
-        // Image not null
-        Product product = Product.getProduct("Product", "Brand", 1, 1, "http://localhost:8080/images/mascara.jpg", 1,
-                "Characteristics", "Section 1");
-        assertNotNull(product);
-        assertEquals(1, product.getId());
-        assertEquals("Product", product.getName());
-        assertEquals("Brand", product.getBrand());
-        assertEquals(1, product.getPackageSize());
-        assertEquals(1, product.getPrice());
-        assertEquals("http://localhost:8080/images/mascara.jpg", product.getImage());
-        assertEquals(1, product.getAvailability());
-        assertEquals("Characteristics", product.getCharacteristics());
-        assertEquals("Section 1", product.getSection());
-        // Image null
-        product = Product.getProduct("Product", "Brand", 1, 1,
-                null, 1, "Characteristics",
-                "Section 1");
-        assertNotNull(product);
-        assertEquals(2, product.getId());
-        assertEquals("Product", product.getName());
-        assertEquals("Brand", product.getBrand());
-        assertEquals(1, product.getPackageSize());
-        assertEquals(1, product.getPrice());
-        assertNull(product.getImage());
-        assertEquals(1, product.getAvailability());
-        assertEquals("Characteristics", product.getCharacteristics());
-    }
-
-    @Test
-    void getProductById() {
         Product product = Product.getProduct(1);
         assertNotNull(product);
         assertEquals(1, product.getId());
@@ -65,9 +36,10 @@ class ProductTest {
     }
 
     @Test
-    void createProduct() {
-        Product product = Product.createProduct("Test", "Brand", 1, 1, null,
-                1, "Characteristics", "Section");
+    void createProduct() throws SQLException {
+        Integer id = Product.createProduct("Test", "Brand", 1, 1, null, 1, "Characteristics", "Section");
+        assertEquals(id, 4);
+        Product product = Product.getProduct(id);
         assertNotNull(product);
         assertEquals("Test", product.getName());
         assertEquals("Brand", product.getBrand());

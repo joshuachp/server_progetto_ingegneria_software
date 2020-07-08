@@ -36,10 +36,10 @@ public class Order {
      * @param delivery_end   Delivery end
      * @param state          State
      * @param user_id        User id
-     * @return True on success
+     * @return The id of the new order
      * @throws SQLException On error
      */
-    public static boolean createOrder(Integer payment, Date delivery_start, Date delivery_end, Integer state,
+    public static Integer createOrder(Integer payment, Date delivery_start, Date delivery_end, Integer state,
                                       Integer user_id) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
@@ -50,7 +50,12 @@ public class Order {
         statement.setDate(3, delivery_end);
         statement.setInt(4, state);
         statement.setInt(5, user_id);
-        return statement.executeUpdate() == 1;
+        if (statement.executeUpdate() == 1) {
+            ResultSet keys = statement.getGeneratedKeys();
+            if (keys.next())
+                return keys.getInt(1);
+        }
+        throw new SQLException("Wrong number of modified rows");
     }
 
     public static @Nullable Order getOrder(Integer id) throws SQLException {

@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,9 +148,9 @@ public class Router {
      */
     @PostMapping(value = "/api/client/update")
     private String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
-            @RequestParam String name, @RequestParam String surname, @RequestParam String address,
-            @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
-            @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
+                                @RequestParam String name, @RequestParam String surname, @RequestParam String address,
+                                @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
+                                @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
         if (userSessions.containsKey(session)) {
             // If set update user password
             User user = userSessions.get(session);
@@ -200,9 +202,9 @@ public class Router {
      */
     @PostMapping(value = "/api/client/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public String registerClient(@RequestParam String username, @RequestParam String password,
-            @RequestParam String name, @RequestParam String surname, @RequestParam String address,
-            @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
-            @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
+                                 @RequestParam String name, @RequestParam String surname, @RequestParam String address,
+                                 @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
+                                 @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         userSessions.put(session, user);
@@ -235,9 +237,9 @@ public class Router {
      */
     @PostMapping(value = "/api/manager/register")
     public String registerManager(@RequestParam String username, @RequestParam String password,
-            @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
-            @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-            @RequestParam String telephone, @RequestParam String role) {
+                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
+                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                  @RequestParam String telephone, @RequestParam String role) {
         User user = User.createUser(username, Utils.hashPassword(password), false);
         String session = Utils.createSession();
         userSessions.put(session, user);
@@ -267,9 +269,9 @@ public class Router {
      */
     @PostMapping(value = "/api/manager/update")
     private String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
-            @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
-            @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-            @RequestParam String telephone, @RequestParam String role) {
+                                 @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
+                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                 @RequestParam String telephone, @RequestParam String role) {
         if (userSessions.containsKey(session)) {
             // If set update user password
             User user = userSessions.get(session);
@@ -304,7 +306,8 @@ public class Router {
      * @param body A json string, with a products array
      * @return String ok on success
      */
-    @PostMapping(value = "/api/product/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/product/create", produces = MediaType.APPLICATION_JSON_VALUE, consumes =
+            MediaType.APPLICATION_JSON_VALUE)
     public String createProducts(@RequestBody String body) {
         // Check session
         JSONObject json = new JSONObject(body);
@@ -327,13 +330,16 @@ public class Router {
                         }
                     }
                     // Create the product, this can create a duplicate product with different id but
-                    // we leve the
-                    // manager to manually control this
-                    if (Product.createProduct(product.getString("name"), product.getString("brand"),
-                            product.getInt("package_size"), product.getInt("price"),
-                            product.isNull("image") ? null : product.getString("image"), product.getInt("availability"),
-                            product.getString("characteristics"), sectionName) == null)
+                    // we leve the manager to manually control this
+                    try {
+                        Product.createProduct(product.getString("name"), product.getString("brand"), product.getInt(
+                                "package_size"), product.getInt("price"),
+                                product.isNull("image") ? null : product.getString("image"),
+                                product.getInt("availability"), product.getString("characteristics"), sectionName);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
                 }
                 return "OK";
             }
@@ -403,7 +409,7 @@ public class Router {
      */
     @PostMapping(value = "/api/card/{card_number}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getLoyaltyCard(@PathVariable(value = "card_number") Integer card_number,
-            @RequestParam String session) {
+                                 @RequestParam String session) {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         User user = userSessions.get(session);
@@ -423,15 +429,35 @@ public class Router {
     /**
      * Create a new order for a client
      *
-     * @param session User session
-     * @param products List of products ids
      * @return "OK" on success
      */
-    @PostMapping(value = "/api/order/create")
-    public String createOrder(@RequestParam String session, @RequestParam List<Integer> products) {
-        if(!userSessions.containsKey(session))
+    @PostMapping(value = "/api/order/create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String createOrder(@RequestBody String body) {
+        // Checks request body
+        JSONObject json = new JSONObject(body);
+        if (!(json.has("session") && json.has("products") && json.has("deliveryStart") && json.has("deliveryEnd")))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        String session = json.getString("session");
+        if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        
-        return null;
+        User user = userSessions.get(session);
+        if (user.isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        Client client = Client.getClient(user.getId());
+        if (client == null)
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            // Create order
+            Integer orderId = Order.createOrder(client.getPayment(), new Date(json.getLong("deliveryStart")),
+                    new Date(json.getLong("deliveryEnd")), 0, user.getId());
+            // Get product map
+            Map<Integer, Integer> map = Utils.convertToIntegerMap(json.getJSONObject("products").toMap());
+            // Creates product items
+            if (OrderItem.batchCreateOrderItems(orderId, map))
+                return "OK";
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

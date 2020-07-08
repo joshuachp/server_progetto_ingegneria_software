@@ -1,10 +1,7 @@
 package org.example.server.routes;
 
 import org.example.server.database.MockDatabase;
-import org.example.server.models.Client;
-import org.example.server.models.Manager;
-import org.example.server.models.Product;
-import org.example.server.models.User;
+import org.example.server.models.*;
 import org.example.server.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,6 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -333,7 +332,7 @@ class RouterTest {
                 .andReturn();
         JSONObject user = new JSONObject(result.getResponse().getContentAsString());
         // No image for null
-        JSONObject product = new JSONObject()
+        JSONObject productJson = new JSONObject()
                 .put("name", "Name")
                 .put("brand", "Brand")
                 .put("package_size", 1)
@@ -342,15 +341,15 @@ class RouterTest {
                 .put("characteristics", "Characteristic")
                 .put("section", "Section");
         JSONObject json = new JSONObject()
-                .accumulate("products", product)
-                .accumulate("products", product)
+                .accumulate("products", productJson)
+                .accumulate("products", productJson)
                 .put("session", user.get("session"));
         this.mockMvc.perform(post("/api/product/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json.toString()))
                 .andExpect(status().isOk());
-        Product product1 = Product.getProduct("Name", "Brand", 1, 1, null, 1, "Characteristic", "Section");
-        assertNotNull(product1);
+        Product product = Product.getProduct(4);
+        assertNotNull(product);
     }
 
     @Test
@@ -462,5 +461,43 @@ class RouterTest {
         assertEquals(1234, json.getInt("card_number"));
         assertEquals(new Date(0), new Date(json.getLong("emission_date")));
         assertEquals(500, json.getInt("points"));
+    }
+
+    @Test
+    void createOrder() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        String session = json.getString("session");
+        // Request
+        int total = 0;
+        Map<Integer, Integer> products = new HashMap<>();
+        for (int i = 1; i < 4; i++) {
+            products.put(i, i);
+            total += i;
+        }
+        json = new JSONObject()
+                .put("session", session)
+                .put("products", products)
+                .put("deliveryEnd", new Date(0).getTime())
+                .put("deliveryStart", new Date(0).getTime());
+        this.mockMvc.perform(
+                post("/api/order/create")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(json.toString()))
+                .andExpect(status().isOk());
+        // Check order
+        Order order = Order.getOrder(2);
+        assertNotNull(order);
+        assertEquals(total, order.getTotal());
+        assertEquals(0, order.getPayment());
+        assertEquals(new Date(0), order.getDeliveryStart());
+        assertEquals(new Date(0), order.getDeliveryEnd());
+        assertEquals(0, order.getState());
+        assertEquals(2, order.getUserId());
+        // Check order items
+        // TODO
     }
 }

@@ -64,7 +64,7 @@ public class OrderItem {
      * @return True on success
      * @throws SQLException On error
      */
-    public static boolean batchCreateOrderItems(Integer orderId, Map<Integer, Integer> products) throws SQLException {
+    public static boolean batchCreateOrderItems(Integer orderId, @NotNull Map<Integer, Integer> products) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement insertStatement = database.getConnection()
                 .prepareStatement("INSERT INTO order_items(name, price, quantity, product_id, order_id) "
