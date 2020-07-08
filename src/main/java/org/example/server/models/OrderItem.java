@@ -87,7 +87,7 @@ public class OrderItem {
         }
         // Check that the changes of both batches are the same as the products size
         return Arrays.stream(insertStatement.executeBatch()).sum() == products.size() &&
-                Arrays.stream(insertStatement.executeBatch()).sum() == products.size();
+                Arrays.stream(updateStatement.executeBatch()).sum() == products.size();
     }
 
     /**

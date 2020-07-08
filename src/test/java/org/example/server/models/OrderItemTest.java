@@ -4,6 +4,7 @@ import org.example.server.database.MockDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -46,16 +47,15 @@ class OrderItemTest {
 
     @Test
     void createOrderItems() throws SQLException {
-        Order order = Order.getOrder(1);
-        assertNotNull(order);
-        int total = order.getTotal();
+        assertTrue(Order.createOrder(0, new Date(0), new Date(0), 0, 2));
+        int total = 0;
         Map<Integer, Integer> products = new HashMap<>();
         for (int i = 1; i < 4; i++) {
             products.put(i, i);
             total += i;
         }
-        assertTrue(OrderItem.batchCreateOrderItems(1, products));
-        order = Order.getOrder(1);
+        assertTrue(OrderItem.batchCreateOrderItems(2, products));
+        Order order = Order.getOrder(2);
         assertNotNull(order);
         assertEquals(total, order.getTotal());
     }
