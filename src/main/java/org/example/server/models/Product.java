@@ -17,13 +17,13 @@ public class Product {
     private final String name;
     private final String brand;
     private final Integer package_size;
-    private final Integer price;
+    private final Float price;
     private final String image;
     private final Integer availability;
     private final String characteristics;
     private final String section;
 
-    public Product(Integer id, String name, String brand, Integer package_size, Integer price, String image,
+    public Product(Integer id, String name, String brand, Integer package_size, Float price, String image,
                    Integer availability, String characteristics, String section) {
         this.id = id;
         this.name = name;
@@ -50,7 +50,7 @@ public class Product {
                         "section FROM products");
         while (resultSet.next()) {
             list.add(new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
+                    resultSet.getInt(4), resultSet.getFloat(5), resultSet.getString(6), resultSet.getInt(7),
                     resultSet.getString(8), resultSet.getString(9)));
         }
         return list;
@@ -69,7 +69,7 @@ public class Product {
      * @param section         Section id
      * @return Return the new product id
      */
-    public static @NotNull Integer createProduct(String name, String brand, Integer package_size, Integer price,
+    public static @NotNull Integer createProduct(String name, String brand, Integer package_size, Float price,
                                                  String image, Integer availability, String characteristics,
                                                  String section) throws SQLException {
         Database database = Database.getInstance();
@@ -79,7 +79,7 @@ public class Product {
         statement.setString(1, name);
         statement.setString(2, brand);
         statement.setInt(3, package_size);
-        statement.setInt(4, price);
+        statement.setFloat(4, price);
         statement.setString(5, image);
         statement.setInt(6, availability);
         statement.setString(7, characteristics);
@@ -107,7 +107,7 @@ public class Product {
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.next()) {
             return new Product(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
-                    resultSet.getInt(4), resultSet.getInt(5), resultSet.getString(6), resultSet.getInt(7),
+                    resultSet.getInt(4), resultSet.getFloat(5), resultSet.getString(6), resultSet.getInt(7),
                     resultSet.getString(8), resultSet.getString(9));
         }
         return null;
@@ -125,7 +125,7 @@ public class Product {
         return package_size;
     }
 
-    public Integer getPrice() {
+    public Float getPrice() {
         return price;
     }
 

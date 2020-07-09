@@ -13,12 +13,12 @@ import java.util.Map;
 public class OrderItem {
     private final Integer id;
     private final String name;
-    private final Integer price;
+    private final Float price;
     private final Integer quantity;
     private final Integer product_id;
     private final Integer order_id;
 
-    public OrderItem(Integer id, String name, Integer price, Integer quantity, Integer product_id, Integer order_id) {
+    public OrderItem(Integer id, String name, Float price, Integer quantity, Integer product_id, Integer order_id) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -117,7 +117,7 @@ public class OrderItem {
         ResultSet resultSet = statement.executeQuery();
         ArrayList<OrderItem> list = new ArrayList<>();
         while (resultSet.next()) {
-            list.add(new OrderItem(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3),
+            list.add(new OrderItem(resultSet.getInt(1), resultSet.getString(2), resultSet.getFloat(3),
                     resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6)));
         }
         return list;
@@ -131,7 +131,7 @@ public class OrderItem {
         return name;
     }
 
-    public Integer getPrice() {
+    public Float getPrice() {
         return price;
     }
 

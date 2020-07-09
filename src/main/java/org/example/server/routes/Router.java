@@ -332,8 +332,8 @@ public class Router {
                     // Create the product, this can create a duplicate product with different id but
                     // we leve the manager to manually control this
                     try {
-                        Product.createProduct(product.getString("name"), product.getString("brand"), product.getInt(
-                                "package_size"), product.getInt("price"),
+                        Product.createProduct(product.getString("name"), product.getString("brand"),
+                                product.getInt("package_size"), product.getFloat("price"),
                                 product.isNull("image") ? null : product.getString("image"),
                                 product.getInt("availability"), product.getString("characteristics"), sectionName);
                     } catch (SQLException e) {

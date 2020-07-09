@@ -37,13 +37,11 @@ class OrderTest {
         Order order = Order.getOrder(1);
         assertNotNull(order);
         assertEquals(1, order.getId());
-        assertEquals(3, order.getTotal());
+        assertEquals(3.80f, order.getTotal());
         assertEquals(0, order.getPayment());
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
         assertEquals(0, order.getState());
         assertEquals(2, order.getUserId());
-
-
     }
 }

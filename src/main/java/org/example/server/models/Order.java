@@ -10,14 +10,14 @@ import java.sql.SQLException;
 
 public class Order {
     private final Integer id;
-    private final Integer total;
+    private final Float total;
     private final Integer payment;
     private final Date delivery_start;
     private final Date delivery_end;
     private final Integer state;
     private final Integer user_id;
 
-    public Order(Integer id, Integer total, Integer payment, Date delivery_start, Date delivery_end,
+    public Order(Integer id, Float total, Integer payment, Date delivery_start, Date delivery_end,
                  Integer state, Integer user_id) {
         this.id = id;
         this.total = total;
@@ -66,7 +66,7 @@ public class Order {
         statement.setInt(1, id);
         ResultSet result = statement.executeQuery();
         if (result.next())
-            return new Order(result.getInt(1), result.getInt(2), result.getInt(3), result.getDate(4),
+            return new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
                     result.getDate(5), result.getInt(6), result.getInt(7));
         return null;
     }
@@ -75,7 +75,7 @@ public class Order {
         return id;
     }
 
-    public Integer getTotal() {
+    public Float getTotal() {
         return total;
     }
 

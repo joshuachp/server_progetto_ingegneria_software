@@ -489,7 +489,7 @@ class RouterTest {
         // Check order
         Order order = Order.getOrder(2);
         assertNotNull(order);
-        assertEquals(3, order.getTotal());
+        assertEquals(11.90f, order.getTotal());
         assertEquals(0, order.getPayment());
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());

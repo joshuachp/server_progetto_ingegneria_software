@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OrderItemTest {
+
+    private static final Float[] PRICES = {1.50f, 2.30f};
 
     @BeforeEach
     void setUp() {
@@ -24,13 +27,13 @@ class OrderItemTest {
         // Get available product
         Order order = Order.getOrder(1);
         assertNotNull(order);
-        int total = order.getTotal();
+        Float total = order.getTotal();
         assertTrue(OrderItem.createOrderItem(1, 1, 1));
         order = Order.getOrder(1);
         assertNotNull(order);
-        assertEquals(total + 1, order.getTotal());
         Product product = Product.getProduct(1);
         assertNotNull(product);
+        assertEquals(total + product.getPrice(), order.getTotal());
         assertEquals(0, product.getAvailability());
     }
 
@@ -42,7 +45,7 @@ class OrderItemTest {
             OrderItem item = orderItems.get(i);
             assertEquals(i + 1, item.getId());
             assertEquals("Product", item.getName());
-            assertEquals(1, item.getPrice());
+            assertTrue(Arrays.asList(PRICES).contains(item.getPrice()));
             assertEquals(i + 1, item.getQuantity());
             assertEquals(i + 1, item.getProductId());
             assertEquals(1, item.getOrderId());
@@ -58,7 +61,7 @@ class OrderItemTest {
         assertTrue(OrderItem.batchCreateOrderItems(orderId, products));
         Order order = Order.getOrder(orderId);
         assertNotNull(order);
-        assertEquals(3, order.getTotal());
+        assertEquals(11.90f, order.getTotal());
         Product product = Product.getProduct(1);
         assertNotNull(product);
         assertEquals(0, product.getAvailability());

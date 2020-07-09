@@ -6,11 +6,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductTest {
+
+    public static final Float[] PRICES = {1.50f, 2.30f, 5.20f};
+    public static final String[] IMAGES = {
+            "http://localhost:8080/images/broccoli.jpg",
+            "http://localhost:8080/images/mascara.jpg"
+    };
 
     @BeforeEach
     void setUp() {
@@ -25,7 +32,7 @@ class ProductTest {
         assertEquals("Product", product.getName());
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
-        assertEquals(1, product.getPrice());
+        assertEquals(1.50f, product.getPrice());
         assertEquals("http://localhost:8080/images/mascara.jpg", product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
@@ -37,14 +44,14 @@ class ProductTest {
 
     @Test
     void createProduct() throws SQLException {
-        Integer id = Product.createProduct("Test", "Brand", 1, 1, null, 1, "Characteristics", "Section");
+        Integer id = Product.createProduct("Test", "Brand", 1, 1.50f, null, 1, "Characteristics", "Section");
         assertEquals(id, 4);
         Product product = Product.getProduct(id);
         assertNotNull(product);
         assertEquals("Test", product.getName());
         assertEquals("Brand", product.getBrand());
         assertEquals(1, product.getPackageSize());
-        assertEquals(1, product.getPrice());
+        assertEquals(1.50f, product.getPrice());
         assertNull(product.getImage());
         assertEquals(1, product.getAvailability());
         assertEquals("Characteristics", product.getCharacteristics());
@@ -60,10 +67,9 @@ class ProductTest {
             assertEquals("Product", product.getName());
             assertEquals("Brand", product.getBrand());
             assertEquals(1, product.getPackageSize());
-            assertEquals(1, product.getPrice());
+            assertTrue(Arrays.asList(PRICES).contains(product.getPrice()));
             if (product.getImage() != null)
-                assertTrue(product.getImage().equals("http://localhost:8080/images/broccoli.jpg") ||
-                        product.getImage().equals("http://localhost:8080/images/mascara.jpg"));
+                assertTrue(Arrays.asList(IMAGES).contains(product.getImage()));
             assertTrue(1 == product.getAvailability() || 3 == product.getAvailability());
             assertEquals("Characteristics", product.getCharacteristics());
             assertTrue(product.getSection().equals("Section 1") || product.getSection().equals("Section 2"));
