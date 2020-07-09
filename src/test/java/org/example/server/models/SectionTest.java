@@ -4,6 +4,7 @@ import org.example.server.database.MockDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +20,7 @@ class SectionTest {
     }
 
     @Test
-    void getSection() {
+    void getSection() throws SQLException {
         Section section = Section.getSection("Section 1");
         assertNotNull(section);
         assertEquals(1, section.getId());
@@ -27,14 +28,16 @@ class SectionTest {
     }
 
     @Test
-    void createSection() {
-        Section section = Section.createSection("Test");
+    void createSection() throws SQLException {
+        int sectionId = Section.createSection("Test");
+        Section section = Section.getSection("Test");
         assertNotNull(section);
+        assertEquals(sectionId, section.getId());
         assertEquals("Test", section.getName());
     }
 
     @Test
-    void getAll() {
+    void getAll() throws SQLException {
         List<Section> sections = Section.getAll();
         assertNotNull(sections);
         assertEquals(2, sections.size());

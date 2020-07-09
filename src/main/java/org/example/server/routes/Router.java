@@ -318,16 +318,21 @@ public class Router {
             JSONArray products = json.getJSONArray("products");
             JSONObject product;
             if (!products.isEmpty()) {
+                // Reused variables
+                String sectionName;
+                Section section;
                 for (int i = 0; i < products.length(); i++) {
                     product = products.getJSONObject(i);
                     // Get the section or create it if it doesn't exist
-                    String sectionName = product.getString("section");
-                    Section section = Section.getSection(sectionName);
-                    if (section == null) {
-                        section = Section.createSection(sectionName);
+                    sectionName = product.getString("section");
+                    try {
+                        section = Section.getSection(sectionName);
                         if (section == null) {
-                            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                            Section.createSection(sectionName);
                         }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                     }
                     // Create the product, this can create a duplicate product with different id but
                     // we leve the manager to manually control this
@@ -403,9 +408,13 @@ public class Router {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
-        List<Section> sections = Section.getAll();
-        if (sections == null)
+        List<Section> sections;
+        try {
+            sections = Section.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         sections.forEach(section -> json.append("sections", section.getName()));
         return json.toString();
     }
