@@ -493,4 +493,27 @@ public class Router {
         }
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     * Get all orders for a specific user return a json with an array named orders.
+     *
+     * @param session User session
+     * @return JSON with orders array
+     */
+    @PostMapping(value = "/api/order/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAllOrders(@RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        JSONObject json = new JSONObject();
+        List<Order> orders;
+        try {
+            orders = Order.getOrders(user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        orders.forEach(order -> json.append("orders", order.toJson()));
+        return json.toString();
+    }
 }
