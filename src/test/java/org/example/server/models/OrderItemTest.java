@@ -1,6 +1,7 @@
 package org.example.server.models;
 
 import org.example.server.database.MockDatabase;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -68,5 +69,38 @@ class OrderItemTest {
         product = Product.getProduct(3);
         assertNotNull(product);
         assertEquals(1, product.getAvailability());
+    }
+
+    @Test
+    void batchCreateOrderItems() throws SQLException {
+        // Get available product
+        Order order = Order.getOrder(1);
+        assertNotNull(order);
+        Float total = order.getTotal();
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(1, 1);
+        assertTrue(OrderItem.batchCreateOrderItems(1, map));
+        order = Order.getOrder(1);
+        assertNotNull(order);
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals(total + product.getPrice(), order.getTotal());
+        assertEquals(0, product.getAvailability());
+    }
+
+    @Test
+    void toJson() {
+        OrderItem item = new OrderItem(1, "Name", 1.0f, 1, 1, 1);
+        JSONObject json = item.toJson();
+
+        assertTrue(json.has("name"));
+        assertTrue(json.has("price"));
+        assertTrue(json.has("quantity"));
+        assertTrue(json.has("productId"));
+
+        assertEquals("Name", json.getString("name"));
+        assertEquals(1.0f, json.getFloat("price"));
+        assertEquals(1, json.getInt("quantity"));
+        assertEquals(1, json.getInt("productId"));
     }
 }

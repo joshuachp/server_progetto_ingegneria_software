@@ -516,4 +516,39 @@ public class Router {
         orders.forEach(order -> json.append("orders", order.toJson()));
         return json.toString();
     }
+
+    /**
+     * Get all orders items for a specific order return a json with an array named orderItems.
+     *
+     * @param orderId Order id
+     * @param session User session
+     * @return JSON with orders array
+     */
+    @PostMapping(value = "/api/order-item/all/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getOrderItems(@PathVariable(value = "orderId") Integer orderId, @RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        Order order;
+        try {
+            order = Order.getOrder(orderId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (order == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!order.getUserId().equals(user.getId()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        JSONObject json = new JSONObject();
+        List<OrderItem> orderItems;
+        try {
+            orderItems = OrderItem.getOrderItems(orderId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        orderItems.forEach(item -> json.append("orderItems", item.toJson()));
+        return json.toString();
+    }
 }

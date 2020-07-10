@@ -2,6 +2,7 @@ package org.example.server.models;
 
 import org.example.server.database.Database;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -145,5 +146,18 @@ public class OrderItem {
 
     public Integer getQuantity() {
         return quantity;
+    }
+
+    /**
+     * Return the JSON of the order item instance.
+     *
+     * @return JSON object
+     */
+    public JSONObject toJson() {
+        return new JSONObject()
+                .put("name", this.name)
+                .put("price", this.price)
+                .put("quantity", this.quantity)
+                .put("productId", this.product_id);
     }
 }
