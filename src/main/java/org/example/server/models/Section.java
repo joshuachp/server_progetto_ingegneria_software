@@ -1,6 +1,8 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,40 +23,31 @@ public class Section {
     /**
      * @return ArrayList of products, null on error
      */
-    public static ArrayList<Section> getAll() {
+    public static @NotNull ArrayList<Section> getAll() throws SQLException {
         Database database = Database.getInstance();
         ArrayList<Section> list = new ArrayList<>();
-        try {
-            Statement statement = database.getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT id, name FROM sections");
-            while (resultSet.next()) {
-                list.add(new Section(resultSet.getInt(1), resultSet.getString(2)));
-            }
-            return list;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Statement statement = database.getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT id, name FROM sections");
+        while (resultSet.next()) {
+            list.add(new Section(resultSet.getInt(1), resultSet.getString(2)));
         }
-        return null;
+        return list;
     }
 
     /**
      * Get a section with the given name
      *
      * @param name Section name to search
-     * @return Section information, null on error
+     * @return Section information, null if doest exists
      */
-    public static Section getSection(String name) {
+    public static @Nullable Section getSection(String name) throws SQLException {
         Database database = Database.getInstance();
-        try {
-            PreparedStatement statement = database.getConnection()
-                    .prepareStatement("SELECT id, name FROM sections WHERE name = ?");
-            statement.setString(1, name);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new Section(resultSet.getInt(1), resultSet.getString(2));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("SELECT id, name FROM sections WHERE name = ?");
+        statement.setString(1, name);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            return new Section(resultSet.getInt(1), resultSet.getString(2));
         }
         return null;
     }
@@ -63,22 +56,19 @@ public class Section {
      * Create a new session with the given name
      *
      * @param name Name of the session
-     * @return The session created, null on error
+     * @return The new session id
      */
-    public static Section createSection(String name) {
+    public static @NotNull Integer createSection(String name) throws SQLException {
         Database database = Database.getInstance();
-        if (Section.getSection(name) == null) {
-            try {
-                PreparedStatement statement = database.getConnection()
-                        .prepareStatement("INSERT INTO sections(name) VALUES(?)");
-                statement.setString(1, name);
-                statement.executeUpdate();
-                return Section.getSection(name);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("INSERT INTO sections(name) VALUES(?)");
+        statement.setString(1, name);
+        if (statement.executeUpdate() == 1) {
+            ResultSet keys = statement.getGeneratedKeys();
+            if (keys.next())
+                return keys.getInt(1);
         }
-        return null;
+        throw new SQLException("Wrong number of modified rows");
     }
 
     public String getName() {

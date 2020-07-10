@@ -318,22 +318,27 @@ public class Router {
             JSONArray products = json.getJSONArray("products");
             JSONObject product;
             if (!products.isEmpty()) {
+                // Reused variables
+                String sectionName;
+                Section section;
                 for (int i = 0; i < products.length(); i++) {
                     product = products.getJSONObject(i);
                     // Get the section or create it if it doesn't exist
-                    String sectionName = product.getString("section");
-                    Section section = Section.getSection(sectionName);
-                    if (section == null) {
-                        section = Section.createSection(sectionName);
+                    sectionName = product.getString("section");
+                    try {
+                        section = Section.getSection(sectionName);
                         if (section == null) {
-                            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                            Section.createSection(sectionName);
                         }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                     }
                     // Create the product, this can create a duplicate product with different id but
                     // we leve the manager to manually control this
                     try {
-                        Product.createProduct(product.getString("name"), product.getString("brand"), product.getInt(
-                                "package_size"), product.getInt("price"),
+                        Product.createProduct(product.getString("name"), product.getString("brand"),
+                                product.getInt("package_size"), product.getFloat("price"),
                                 product.isNull("image") ? null : product.getString("image"),
                                 product.getInt("availability"), product.getString("characteristics"), sectionName);
                     } catch (SQLException e) {
@@ -403,9 +408,13 @@ public class Router {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
-        List<Section> sections = Section.getAll();
-        if (sections == null)
+        List<Section> sections;
+        try {
+            sections = Section.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         sections.forEach(section -> json.append("sections", section.getName()));
         return json.toString();
     }
@@ -483,5 +492,63 @@ public class Router {
             e.printStackTrace();
         }
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Get all orders for a specific user return a json with an array named orders.
+     *
+     * @param session User session
+     * @return JSON with orders array
+     */
+    @PostMapping(value = "/api/order/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAllOrders(@RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        JSONObject json = new JSONObject();
+        List<Order> orders;
+        try {
+            orders = Order.getOrders(user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        orders.forEach(order -> json.append("orders", order.toJson()));
+        return json.toString();
+    }
+
+    /**
+     * Get all orders items for a specific order return a json with an array named orderItems.
+     *
+     * @param orderId Order id
+     * @param session User session
+     * @return JSON with orders array
+     */
+    @PostMapping(value = "/api/order-item/all/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getOrderItems(@PathVariable(value = "orderId") Integer orderId, @RequestParam String session) {
+        if (!userSessions.containsKey(session))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        User user = userSessions.get(session);
+        Order order;
+        try {
+            order = Order.getOrder(orderId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (order == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!order.getUserId().equals(user.getId()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        JSONObject json = new JSONObject();
+        List<OrderItem> orderItems;
+        try {
+            orderItems = OrderItem.getOrderItems(orderId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        orderItems.forEach(item -> json.append("orderItems", item.toJson()));
+        return json.toString();
     }
 }

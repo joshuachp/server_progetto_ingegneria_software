@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest
 class RouterTest {
+
+    private static final Float[] PRICES = {1.50f, 2.30f};
 
     @Autowired
     private MockMvc mockMvc;
@@ -489,7 +492,7 @@ class RouterTest {
         // Check order
         Order order = Order.getOrder(2);
         assertNotNull(order);
-        assertEquals(3, order.getTotal());
+        assertEquals(11.90f, order.getTotal());
         assertEquals(0, order.getPayment());
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
@@ -502,5 +505,64 @@ class RouterTest {
         assertEquals(1, orderItems.get(0).getQuantity());
         assertEquals(3, orderItems.get(1).getProductId());
         assertEquals(2, orderItems.get(1).getQuantity());
+    }
+
+    @Test
+    void getAllOrders() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/order/all")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("orders"));
+
+        JSONArray orders = json.getJSONArray("orders");
+        assertEquals(1, orders.length());
+
+        json = orders.getJSONObject(0);
+        assertEquals(1, json.getInt("id"));
+        assertEquals(3.80f, json.getFloat("total"));
+        assertEquals(0, json.getInt("payment"));
+        assertEquals(new Date(0), new Date(json.getLong("deliveryStart")));
+        assertEquals(new Date(0), new Date(json.getLong("deliveryEnd")));
+        assertEquals(0, json.getInt("state"));
+    }
+
+    @Test
+    void getOrderItems() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "guest")
+                .param("password", "guest"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/order-item/all/1")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("orderItems"));
+
+        JSONArray orderItems = json.getJSONArray("orderItems");
+        assertEquals(2, orderItems.length());
+
+        json = orderItems.getJSONObject(0);
+
+        assertEquals(2, orderItems.length());
+        for (int i = 0; i < orderItems.length(); i++) {
+            JSONObject item = orderItems.getJSONObject(i);
+            assertEquals("Product", item.getString("name"));
+            assertTrue(Arrays.asList(PRICES).contains(item.getFloat("price")));
+            assertEquals(i + 1, item.getInt("quantity"));
+            assertEquals(i + 1, item.getInt("productId"));
+        }
     }
 }

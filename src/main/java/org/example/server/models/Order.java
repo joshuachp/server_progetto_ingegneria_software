@@ -1,23 +1,26 @@
 package org.example.server.models;
 
 import org.example.server.database.Database;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Order {
     private final Integer id;
-    private final Integer total;
+    private final Float total;
     private final Integer payment;
     private final Date delivery_start;
     private final Date delivery_end;
     private final Integer state;
     private final Integer user_id;
 
-    public Order(Integer id, Integer total, Integer payment, Date delivery_start, Date delivery_end,
+    public Order(Integer id, Float total, Integer payment, Date delivery_start, Date delivery_end,
                  Integer state, Integer user_id) {
         this.id = id;
         this.total = total;
@@ -58,6 +61,13 @@ public class Order {
         throw new SQLException("Wrong number of modified rows");
     }
 
+    /**
+     * Get order data by its id
+     *
+     * @param id Order id
+     * @return Order instance, null if not found
+     * @throws SQLException On error
+     */
     public static @Nullable Order getOrder(Integer id) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
@@ -66,16 +76,38 @@ public class Order {
         statement.setInt(1, id);
         ResultSet result = statement.executeQuery();
         if (result.next())
-            return new Order(result.getInt(1), result.getInt(2), result.getInt(3), result.getDate(4),
+            return new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
                     result.getDate(5), result.getInt(6), result.getInt(7));
         return null;
+    }
+
+    /**
+     * Get a list of order data of a specific user given a user id.
+     *
+     * @param userId User id
+     * @return List of orders
+     * @throws SQLException On error
+     */
+    public static @NotNull ArrayList<Order> getOrders(Integer userId) throws SQLException {
+        ArrayList<Order> list = new ArrayList<>();
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, user_id " +
+                        "FROM orders WHERE user_id = ?");
+        statement.setInt(1, userId);
+        ResultSet result = statement.executeQuery();
+        while (result.next()) {
+            list.add(new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
+                    result.getDate(5), result.getInt(6), result.getInt(7)));
+        }
+        return list;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public Integer getTotal() {
+    public Float getTotal() {
         return total;
     }
 
@@ -99,4 +131,18 @@ public class Order {
         return user_id;
     }
 
+    /**
+     * Return the JSON of the order instance, the dates are converted in UNIX epoch.
+     *
+     * @return JSON object
+     */
+    public JSONObject toJson() {
+        return new JSONObject()
+                .put("id", this.id)
+                .put("total", this.total)
+                .put("payment", this.payment)
+                .put("deliveryStart", this.delivery_start.getTime())
+                .put("deliveryEnd", this.delivery_end.getTime())
+                .put("state", this.state);
+    }
 }

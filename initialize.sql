@@ -1,8 +1,8 @@
 CREATE TABLE users (
-	id INTEGER PRIMARY KEY,
-  username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  manager BOOLEAN NOT NULL
+    id INTEGER PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    manager BOOLEAN NOT NULL
 );
 
 CREATE TABLE clients (
@@ -51,7 +51,7 @@ CREATE TABLE products (
     name TEXT NOT NULL,
     brand TEXT NOT NULL,
     package_size INTEGER NOT NULL,
-    price INTEGER NOT NULL,
+    price REAL NOT NULL,
     image TEXT,
     availability INTEGER NOT NULL DEFAULT 0,
     -- TODO: Check more convenient way to use characteristics, maybe another table
@@ -62,7 +62,7 @@ CREATE TABLE products (
 
 CREATE TABLE orders (
 	id INTEGER PRIMARY KEY,
-	total INTEGER NOT NULL,
+	total REAL NOT NULL,
 	payment INTEGER NOT NULL,
 	delivery_start INTEGER NOT NULL,
 	delivery_end INTEGER NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE orders (
 CREATE TABLE order_items (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
-	price INTEGER NOT NULL,
+	price REAL NOT NULL,
 	quantity INTEGER NOT NULL,
 	product_id INTEGER NOT NULL,
 	order_id INTEGER NOT NULL,
@@ -104,19 +104,19 @@ INSERT INTO sections(name) VALUES("Section 1");
 INSERT INTO sections(name) VALUES("Section 2");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', "Section 1");
+    VALUES ('Product', 'Brand', 1, 1.50,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', "Section 1");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, NULL, 0, 'Characteristics', "Section 1");
+    VALUES ('Product', 'Brand', 1, 2.30, NULL, 0, 'Characteristics', "Section 1");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', "Section 2");
+    VALUES ('Product', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', "Section 2");
 
 INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id)
-    VALUES (3, 0, 0, 0, 0, 2);
+    VALUES (3.80, 0, 0, 0, 0, 2);
 
 INSERT INTO order_items(name, price, quantity, product_id, order_id)
-    VALUES ("Product", 1, 1, 1, 1);
+    VALUES ("Product", 1.50, 1, 1, 1);
 
 INSERT INTO order_items(name, price, quantity, product_id, order_id)
-    VALUES ("Product", 1, 2, 2, 1);
+    VALUES ("Product", 2.30, 2, 2, 1);
