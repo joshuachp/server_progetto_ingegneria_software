@@ -5,11 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Order {
     private final Integer id;
@@ -100,6 +98,25 @@ public class Order {
             list.add(new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
                     result.getDate(5), result.getInt(6), result.getInt(7)));
         }
+        return list;
+    }
+
+
+    /**
+     * Get all the orders in the database
+     *
+     * @return List of orders
+     * @throws SQLException On error
+     */
+    public static @NotNull List<Order> getAllOrders() throws SQLException {
+        Database database = Database.getInstance();
+        Statement statement = database.getConnection().createStatement();
+        ResultSet result = statement.executeQuery("SELECT id, total, payment, delivery_start, delivery_end, state, " +
+                "user_id FROM orders");
+        ArrayList<Order> list = new ArrayList<>();
+        while (result.next())
+            list.add(new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
+                    result.getDate(5), result.getInt(6), result.getInt(7)));
         return list;
     }
 
