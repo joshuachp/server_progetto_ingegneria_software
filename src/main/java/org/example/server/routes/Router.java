@@ -352,6 +352,25 @@ public class Router {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
+    @PostMapping(value = "/api/product/remove", produces = MediaType.APPLICATION_JSON_VALUE, consumes =
+            MediaType.APPLICATION_JSON_VALUE)
+    public String removeProducts(@RequestBody String body) {
+        // Check session
+        JSONObject json = new JSONObject(body);
+        if (!json.has("session") || !userSessions.containsKey(json.getString("session")))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        if (json.has("product_id")) {
+            Integer productId = json.getInt("product_id");
+            try {
+                Product.removeProduct(productId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+        }
+        return "OK";
+    }
+
     /**
      * Get all products, return a json with an array named products.
      *

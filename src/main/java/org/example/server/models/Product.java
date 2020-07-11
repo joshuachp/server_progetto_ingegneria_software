@@ -113,6 +113,16 @@ public class Product {
         return null;
     }
 
+    public static @Nullable Product removeProduct(Integer id) throws SQLException {
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("DELETE FROM products WHERE id = ?");
+        statement.setInt(1, id);
+        statement.executeQuery();
+
+        return null;
+    }
+
     public String getName() {
         return name;
     }
