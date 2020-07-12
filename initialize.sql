@@ -54,7 +54,6 @@ CREATE TABLE products (
     price REAL NOT NULL,
     image TEXT,
     availability INTEGER NOT NULL DEFAULT 0,
-    -- TODO: Check more convenient way to use characteristics, maybe another table
     characteristics TEXT,
     section INTEGER NOT NULL,
 	FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE
