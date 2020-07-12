@@ -595,7 +595,33 @@ class RouterTest {
     }
 
     @Test
+    void removeProduct() throws Exception {
+        // Auth
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        // Remove product id 1
+        this.mockMvc.perform(post("/api/product/1/delete")
+                .param("session", session))
+                .andExpect(status().isOk());
+        assertNull(Product.getProduct(1));
+        // Error session
+        this.mockMvc.perform(post("/api/product/1/delete")
+                .param("session", "test"))
+                .andExpect(status().isUnauthorized());
+        // Error product id
+        this.mockMvc.perform(post("/api/product/42/delete")
+                .param("session", session))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void updateOrderState() throws Exception {
+        // Auth
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
                 .param("password", "password"))
