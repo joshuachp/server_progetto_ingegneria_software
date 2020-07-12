@@ -16,16 +16,18 @@ public class Order {
     private final Date delivery_start;
     private final Date delivery_end;
     private final Integer state;
+    private final String address;
     private final Integer user_id;
 
     public Order(Integer id, Float total, Integer payment, Date delivery_start, Date delivery_end,
-                 Integer state, Integer user_id) {
+                 Integer state, String address, Integer user_id) {
         this.id = id;
         this.total = total;
         this.payment = payment;
         this.delivery_start = delivery_start;
         this.delivery_end = delivery_end;
         this.state = state;
+        this.address = address;
         this.user_id = user_id;
     }
 
@@ -41,16 +43,17 @@ public class Order {
      * @throws SQLException On error
      */
     public static Integer createOrder(Integer payment, Date delivery_start, Date delivery_end, Integer state,
-                                      Integer user_id) throws SQLException {
+                                      String address, Integer user_id) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
-                .prepareStatement("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id) "
-                        + "VALUES(0, ?, ?, ?, ?, ?)");
+                .prepareStatement("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, " +
+                        "user_id) VALUES(0, ?, ?, ?, ?, ?, ?)");
         statement.setInt(1, payment);
         statement.setDate(2, delivery_start);
         statement.setDate(3, delivery_end);
         statement.setInt(4, state);
-        statement.setInt(5, user_id);
+        statement.setString(5, address);
+        statement.setInt(6, user_id);
         if (statement.executeUpdate() == 1) {
             ResultSet keys = statement.getGeneratedKeys();
             if (keys.next())
@@ -69,13 +72,13 @@ public class Order {
     public static @Nullable Order getOrder(Integer id) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
-                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, user_id " +
+                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, address, user_id " +
                         "FROM orders WHERE id = ?");
         statement.setInt(1, id);
         ResultSet result = statement.executeQuery();
         if (result.next())
             return new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
-                    result.getDate(5), result.getInt(6), result.getInt(7));
+                    result.getDate(5), result.getInt(6), result.getString(7), result.getInt(8));
         return null;
     }
 
@@ -90,17 +93,16 @@ public class Order {
         ArrayList<Order> list = new ArrayList<>();
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
-                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, user_id " +
+                .prepareStatement("SELECT id, total, payment, delivery_start, delivery_end, state, address, user_id " +
                         "FROM orders WHERE user_id = ?");
         statement.setInt(1, userId);
         ResultSet result = statement.executeQuery();
         while (result.next()) {
             list.add(new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
-                    result.getDate(5), result.getInt(6), result.getInt(7)));
+                    result.getDate(5), result.getInt(6), result.getString(7), result.getInt(8)));
         }
         return list;
     }
-
 
     /**
      * Get all the orders in the database
@@ -112,11 +114,11 @@ public class Order {
         Database database = Database.getInstance();
         Statement statement = database.getConnection().createStatement();
         ResultSet result = statement.executeQuery("SELECT id, total, payment, delivery_start, delivery_end, state, " +
-                "user_id FROM orders");
+                "address, user_id FROM orders");
         ArrayList<Order> list = new ArrayList<>();
         while (result.next())
             list.add(new Order(result.getInt(1), result.getFloat(2), result.getInt(3), result.getDate(4),
-                    result.getDate(5), result.getInt(6), result.getInt(7)));
+                    result.getDate(5), result.getInt(6), result.getString(7), result.getInt(8)));
         return list;
     }
 
@@ -136,6 +138,7 @@ public class Order {
         statement.setInt(2, id);
         return statement.executeUpdate() == 1;
     }
+
 
     public Integer getId() {
         return id;
@@ -161,6 +164,10 @@ public class Order {
         return state;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public Integer getUserId() {
         return user_id;
     }
@@ -177,6 +184,7 @@ public class Order {
                 .put("payment", this.payment)
                 .put("deliveryStart", this.delivery_start.getTime())
                 .put("deliveryEnd", this.delivery_end.getTime())
-                .put("state", this.state);
+                .put("state", this.state)
+                .put("address", this.address);
     }
 }

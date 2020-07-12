@@ -20,7 +20,7 @@ class OrderTest {
 
     @Test
     void createOrder() throws SQLException {
-        Integer id = Order.createOrder(0, new Date(0), new Date(0), 0, 2);
+        Integer id = Order.createOrder(0, new Date(0), new Date(0), 0, "Test", 2);
         assertEquals(2, id);
         Order order = Order.getOrder(id);
         assertNotNull(order);
@@ -30,6 +30,7 @@ class OrderTest {
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
         assertEquals(0, order.getState());
+        assertEquals("Test", order.getAddress());
         assertEquals(2, order.getUserId());
     }
 
@@ -43,6 +44,7 @@ class OrderTest {
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
         assertEquals(0, order.getState());
+        assertEquals("Via Viale 1, 33333, City", order.getAddress());
         assertEquals(2, order.getUserId());
     }
 
@@ -57,6 +59,7 @@ class OrderTest {
         assertEquals(new Date(0), order.getDeliveryStart());
         assertEquals(new Date(0), order.getDeliveryEnd());
         assertEquals(0, order.getState());
+        assertEquals("Via Viale 1, 33333, City", order.getAddress());
         assertEquals(2, order.getUserId());
     }
 
@@ -73,6 +76,7 @@ class OrderTest {
         assertTrue(json.has("deliveryStart"));
         assertTrue(json.has("deliveryEnd"));
         assertTrue(json.has("state"));
+        assertTrue(json.has("address"));
 
         assertEquals(1, json.getInt("id"));
         assertEquals(3.80f, json.getFloat("total"));
@@ -80,6 +84,7 @@ class OrderTest {
         assertEquals(new Date(0), new Date(json.getLong("deliveryStart")));
         assertEquals(new Date(0), new Date(json.getLong("deliveryEnd")));
         assertEquals(0, json.getInt("state"));
+        assertEquals("Via Viale 1, 33333, City", json.getString("address"));
     }
 
     @Test

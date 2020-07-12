@@ -359,9 +359,9 @@ public class Router {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
 
         try {
-            if(Product.getProduct(id) == null)
+            if (Product.getProduct(id) == null)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            if(!Product.removeProduct(id))
+            if (!Product.removeProduct(id))
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -503,7 +503,8 @@ public class Router {
         try {
             // Create order
             Integer orderId = Order.createOrder(client.getPayment(), new Date(json.getLong("deliveryStart")),
-                    new Date(json.getLong("deliveryEnd")), 0, user.getId());
+                    new Date(json.getLong("deliveryEnd")), 0, String.format("%s, %d, %s", client.getAddress(),
+                            client.getCap(), client.getCity()), user.getId());
             // Creates product items
             if (OrderItem.batchCreateOrderItems(orderId, map))
                 return "OK";
@@ -537,7 +538,7 @@ public class Router {
     }
 
     /**
-     * Get all orders for a specific user return a json with an array named orders.
+     * Get all orders for a specific user re a json with an array named orders.
      *
      * @param session User session
      * @return JSON with orders array
