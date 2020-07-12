@@ -624,9 +624,9 @@ public class Router {
 
 
     @PostMapping(value = "/api/product/image/upload")
-    public String productImageUpload(@RequestParam("image") MultipartFile file) {
-        if (file.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    public String productImageUpload(@RequestParam String session, @RequestParam("image") MultipartFile file) {
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         return storageService.store(file);
     }
 
