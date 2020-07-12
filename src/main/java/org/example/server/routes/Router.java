@@ -560,7 +560,7 @@ public class Router {
         }
         if (order == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        if (!order.getUserId().equals(user.getId()))
+        if (!user.isManager() && !order.getUserId().equals(user.getId()))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
         List<OrderItem> orderItems;
@@ -573,4 +573,30 @@ public class Router {
         orderItems.forEach(item -> json.append("orderItems", item.toJson()));
         return json.toString();
     }
+
+    /**
+     * Update an order state
+     *
+     * @param orderId  order id
+     * @param session  User session
+     * @param newState New state
+     * @return OK on success
+     */
+    @PostMapping(value = "/api/order/{orderId}/update")
+    public String updateOrderState(@PathVariable(value = "orderId") Integer orderId, @RequestParam String session,
+                                   @RequestParam Integer newState) {
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        try {
+            if (Order.getOrder(orderId) == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (!Order.updateOrderState(orderId, newState))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return "OK";
+    }
+
 }

@@ -593,4 +593,24 @@ class RouterTest {
         assertEquals(new Date(0), new Date(json.getLong("deliveryEnd")));
         assertEquals(0, json.getInt("state"));
     }
+
+    @Test
+    void updateOrderState() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+
+        this.mockMvc.perform(post("/api/order/1/update")
+                .param("session", session)
+                .param("newState", "1"))
+                .andExpect(status().isOk());
+
+        Order order = Order.getOrder(1);
+        assertNotNull(order);
+        assertEquals(1, order.getState());
+    }
 }

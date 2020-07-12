@@ -81,4 +81,12 @@ class OrderTest {
         assertEquals(new Date(0), new Date(json.getLong("deliveryEnd")));
         assertEquals(0, json.getInt("state"));
     }
+
+    @Test
+    void updateOrderState() throws SQLException {
+        assertTrue(Order.updateOrderState(1, 1));
+        Order order = Order.getOrder(1);
+        assertNotNull(order);
+        assertEquals(1, order.getState());
+    }
 }

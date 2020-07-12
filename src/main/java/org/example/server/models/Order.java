@@ -120,6 +120,23 @@ public class Order {
         return list;
     }
 
+    /**
+     * Update the state of an Order in the database
+     *
+     * @param id    order id
+     * @param state new state
+     * @return True on success
+     * @throws SQLException On error
+     */
+    public static boolean updateOrderState(int id, int state) throws SQLException {
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("UPDATE orders SET state = ? WHERE id = ?");
+        statement.setInt(1, state);
+        statement.setInt(2, id);
+        return statement.executeUpdate() == 1;
+    }
+
     public Integer getId() {
         return id;
     }
