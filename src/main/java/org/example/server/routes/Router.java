@@ -352,22 +352,22 @@ public class Router {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/api/product/remove", produces = MediaType.APPLICATION_JSON_VALUE, consumes =
-            MediaType.APPLICATION_JSON_VALUE)
-    public String removeProducts(@RequestBody String body) {
+    @PostMapping(value = "/api/product/{id}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String removeProduct(@PathVariable(value = "id") Integer id, @RequestParam String session) {
         // Check session
-        JSONObject json = new JSONObject(body);
-        if (!json.has("session") || !userSessions.containsKey(json.getString("session")))
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        if (json.has("product_id")) {
-            Integer productId = json.getInt("product_id");
-            try {
-                Product.removeProduct(productId);
-            } catch (SQLException e) {
-                e.printStackTrace();
+
+        try {
+            if(Product.getProduct(id) == null)
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            }
+            if(!Product.removeProduct(id))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         return "OK";
     }
 

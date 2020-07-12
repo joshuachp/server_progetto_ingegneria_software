@@ -59,6 +59,12 @@ class ProductTest {
     }
 
     @Test
+    void removeProduct() throws SQLException {
+        assertTrue(Product.removeProduct(1));
+        assertNull(Product.getProduct(1));
+    }
+
+    @Test
     void getAll() throws SQLException {
         List<Product> products = Product.getAll();
         assertNotNull(products);
