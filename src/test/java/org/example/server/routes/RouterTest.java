@@ -357,6 +357,39 @@ class RouterTest {
     }
 
     @Test
+    void updateProducts() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject user = new JSONObject(result.getResponse().getContentAsString());
+        // No image for null
+        JSONObject json = new JSONObject()
+                .put("session", user.getString("session"))
+                .put("name", "Name")
+                .put("brand", "Brand")
+                .put("package_size", 1)
+                .put("price", 1)
+                .put("availability", 1)
+                .put("characteristics", "Characteristic")
+                .put("section", "Section");
+        this.mockMvc.perform(post("/api/product/1/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json.toString()))
+                .andExpect(status().isOk());
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals("Name", product.getName());
+        assertEquals( "Brand", product.getBrand());
+        assertEquals(1,product.getPackageSize());
+        assertEquals("Characteristic", product.getCharacteristics());
+        assertEquals("Section", product.getSection());
+        assertEquals(1, product.getAvailability());
+
+    }
+
+    @Test
     void getAllProducts() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")

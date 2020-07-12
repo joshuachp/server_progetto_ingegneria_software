@@ -371,6 +371,32 @@ public class Router {
         return "OK";
     }
 
+    @PostMapping(value = "/api/product/{id}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateProduct(@PathVariable(value = "id") Integer id, @RequestBody String body) {
+        // Check session
+        JSONObject json = new JSONObject(body);
+        if (!json.has("session") || !json.has("name") || !json.has("brand") || !json.has("package_size")
+        || !json.has("price") || !json.has("availability"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!userSessions.containsKey(json.getString("session")))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
+        try {
+            if (Product.getProduct(id) == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (!Product.updateProduct(id, json.getString("name"), json.getString("brand"), json.getInt("package_size"),
+                    json.getFloat("price"), json.isNull("image") ? null : json.getString("image"), json.getInt(
+                            "availability"), json.getString(
+                            "characteristics"), json.getString("section")))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return "OK";
+    }
+
     /**
      * Get all products, return a json with an array named products.
      *
