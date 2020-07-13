@@ -125,7 +125,7 @@ public class Router {
      * @return True for success
      */
     @PostMapping(value = "/api/user/logout")
-    private String logoutUser(@RequestParam String session) {
+    public String logoutUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return "OK";
@@ -149,7 +149,7 @@ public class Router {
      * @return "OK" on success
      */
     @PostMapping(value = "/api/client/update")
-    private String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
+    public String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
                                 @RequestParam String name, @RequestParam String surname, @RequestParam String address,
                                 @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
                                 @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
@@ -270,7 +270,7 @@ public class Router {
      * @return "OK" on success
      */
     @PostMapping(value = "/api/manager/update")
-    private String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
+    public String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
                                  @RequestParam String telephone, @RequestParam String role) {
