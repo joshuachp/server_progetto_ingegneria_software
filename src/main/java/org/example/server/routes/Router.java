@@ -1,11 +1,11 @@
 package org.example.server.routes;
 
-import org.example.server.database.Database;
 import org.example.server.models.*;
 import org.example.server.storage.StorageService;
 import org.example.server.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +29,13 @@ public class Router {
      * Map of the authenticated users. It's in memory since we don't have a lot of
      * users.
      */
-    private final Map<String, User> userSessions;
+    private final Map<String, User> userSessions = new HashMap<>();
 
     private final StorageService storageService;
 
+    @Autowired
     public Router(StorageService storageService) {
         this.storageService = storageService;
-        this.userSessions = new HashMap<>();
-        Database.getInstance();
     }
 
     /**
