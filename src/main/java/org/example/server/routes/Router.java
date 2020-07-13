@@ -243,7 +243,7 @@ public class Router {
                                   @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
                                   @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
                                   @RequestParam String telephone, @RequestParam String role) {
-        User user = User.createUser(username, Utils.hashPassword(password), false);
+        User user = User.createUser(username, Utils.hashPassword(password), true);
         String session = Utils.createSession();
         userSessions.put(session, user);
         if (user != null) {
