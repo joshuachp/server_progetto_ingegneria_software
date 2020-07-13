@@ -3,12 +3,14 @@ package org.example.server.routes;
 import org.example.server.database.MockDatabase;
 import org.example.server.models.*;
 import org.example.server.utils.Utils;
+import org.example.server.storage.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,6 +33,8 @@ class RouterTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+	private StorageService storageService;
 
     @BeforeEach
     void setUp() {
@@ -357,6 +361,39 @@ class RouterTest {
     }
 
     @Test
+    void updateProducts() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject user = new JSONObject(result.getResponse().getContentAsString());
+        // No image for null
+        JSONObject json = new JSONObject()
+                .put("session", user.getString("session"))
+                .put("name", "Name")
+                .put("brand", "Brand")
+                .put("package_size", 1)
+                .put("price", 1)
+                .put("availability", 1)
+                .put("characteristics", "Characteristic")
+                .put("section", "Section");
+        this.mockMvc.perform(post("/api/product/1/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json.toString()))
+                .andExpect(status().isOk());
+        Product product = Product.getProduct(1);
+        assertNotNull(product);
+        assertEquals("Name", product.getName());
+        assertEquals( "Brand", product.getBrand());
+        assertEquals(1,product.getPackageSize());
+        assertEquals("Characteristic", product.getCharacteristics());
+        assertEquals("Section", product.getSection());
+        assertEquals(1, product.getAvailability());
+
+    }
+
+    @Test
     void getAllProducts() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "admin")
@@ -508,7 +545,7 @@ class RouterTest {
     }
 
     @Test
-    void getAllOrders() throws Exception {
+    void getUserOrders() throws Exception {
         MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
                 .param("username", "guest")
                 .param("password", "guest"))
@@ -516,7 +553,7 @@ class RouterTest {
         JSONObject json = new JSONObject(result.getResponse().getContentAsString());
         assertTrue(json.has("session"));
         String session = json.getString("session");
-        result = this.mockMvc.perform(post("/api/order/all")
+        result = this.mockMvc.perform(post("/api/order/user")
                 .param("session", session))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -564,5 +601,79 @@ class RouterTest {
             assertEquals(i + 1, item.getInt("quantity"));
             assertEquals(i + 1, item.getInt("productId"));
         }
+    }
+
+    @Test
+    void getAllOrders() throws Exception {
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        result = this.mockMvc.perform(post("/api/order/all")
+                .param("session", session))
+                .andExpect(status().isOk())
+                .andReturn();
+        json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("orders"));
+
+        JSONArray orders = json.getJSONArray("orders");
+        assertEquals(1, orders.length());
+
+        json = orders.getJSONObject(0);
+        assertEquals(1, json.getInt("id"));
+        assertEquals(3.80f, json.getFloat("total"));
+        assertEquals(0, json.getInt("payment"));
+        assertEquals(new Date(0), new Date(json.getLong("deliveryStart")));
+        assertEquals(new Date(0), new Date(json.getLong("deliveryEnd")));
+        assertEquals(0, json.getInt("state"));
+    }
+
+    @Test
+    void removeProduct() throws Exception {
+        // Auth
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+        // Remove product id 1
+        this.mockMvc.perform(post("/api/product/1/delete")
+                .param("session", session))
+                .andExpect(status().isOk());
+        assertNull(Product.getProduct(1));
+        // Error session
+        this.mockMvc.perform(post("/api/product/1/delete")
+                .param("session", "test"))
+                .andExpect(status().isUnauthorized());
+        // Error product id
+        this.mockMvc.perform(post("/api/product/42/delete")
+                .param("session", session))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateOrderState() throws Exception {
+        // Auth
+        MvcResult result = this.mockMvc.perform(post("/api/user/authenticate")
+                .param("username", "admin")
+                .param("password", "password"))
+                .andExpect(status().isOk()).andReturn();
+        JSONObject json = new JSONObject(result.getResponse().getContentAsString());
+        assertTrue(json.has("session"));
+        String session = json.getString("session");
+
+        this.mockMvc.perform(post("/api/order/1/update")
+                .param("session", session)
+                .param("newState", "1"))
+                .andExpect(status().isOk());
+
+        Order order = Order.getOrder(1);
+        assertNotNull(order);
+        assertEquals(1, order.getState());
     }
 }

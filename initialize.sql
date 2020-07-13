@@ -54,7 +54,6 @@ CREATE TABLE products (
     price REAL NOT NULL,
     image TEXT,
     availability INTEGER NOT NULL DEFAULT 0,
-    -- TODO: Check more convenient way to use characteristics, maybe another table
     characteristics TEXT,
     section INTEGER NOT NULL,
 	FOREIGN KEY(section) REFERENCES sections(name) ON DELETE CASCADE ON UPDATE CASCADE
@@ -67,6 +66,7 @@ CREATE TABLE orders (
 	delivery_start INTEGER NOT NULL,
 	delivery_end INTEGER NOT NULL,
 	state INTEGER NOT NULL,
+	address TEXT NOT NULL,
 	user_id INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -97,7 +97,7 @@ INSERT INTO loyalty_cards (card_number, emission_date, points)
     VALUES (1234, 0, 500);
 
 INSERT INTO clients (name, surname, address, cap, city, telephone, payment, user_id, loyalty_card_number)
-    VALUES('Name', 'Surname', 'Via Viale 1', 33333, 'Città', '3334445555', 0, 2, 1234); -- guest
+    VALUES('Name', 'Surname', 'Via Viale 1', 33333, 'City', '3334445555', 0, 2, 1234); -- guest
 
 INSERT INTO sections(name) VALUES("Section 1");
 
@@ -112,8 +112,8 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Product', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', "Section 2");
 
-INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id)
-    VALUES (3.80, 0, 0, 0, 0, 2);
+INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, user_id)
+    VALUES (3.80, 0, 0, 0, 0, 'Via Viale 1, 33333, City', 2);
 
 INSERT INTO order_items(name, price, quantity, product_id, order_id)
     VALUES ("Product", 1.50, 1, 1, 1);

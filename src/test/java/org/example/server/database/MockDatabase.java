@@ -102,6 +102,7 @@ public class MockDatabase {
                 "delivery_start INTEGER NOT NULL, " +
                 "delivery_end INTEGER NOT NULL, " +
                 "state INTEGER NOT NULL, " +
+                "address TEXT NOT NULL, " +
                 "user_id INTEGER NOT NULL, " +
                 "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE)");
         // Create order items table
@@ -145,8 +146,8 @@ public class MockDatabase {
                 "characteristics, section) VALUES('Product', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli" +
                 ".jpg', 3, 'Characteristics', 'Section 2')");
         // Add order
-        statement.addBatch("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, user_id) " +
-                "VALUES (3.80, 0, 0, 0, 0, 2)");
+        statement.addBatch("INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, user_id)" +
+                " VALUES (3.80, 0, 0, 0, 0, 'Via Viale 1, 33333, City', 2)");
         // Add order items
         statement.addBatch("INSERT INTO order_items(name, price, quantity, product_id, order_id) " +
                 "VALUES('Product', 1.50, 1, 1, 1)");

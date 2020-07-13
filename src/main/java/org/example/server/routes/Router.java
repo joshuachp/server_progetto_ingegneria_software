@@ -1,13 +1,15 @@
 package org.example.server.routes;
 
-import org.example.server.database.Database;
 import org.example.server.models.*;
+import org.example.server.storage.StorageService;
 import org.example.server.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
@@ -22,18 +24,18 @@ import java.util.Map;
 @RestController
 public class Router {
 
+
     /**
      * Map of the authenticated users. It's in memory since we don't have a lot of
      * users.
      */
-    private final Map<String, User> userSessions;
+    private final Map<String, User> userSessions = new HashMap<>();
 
-    /**
-     * Privare server constructor
-     */
-    private Router() {
-        this.userSessions = new HashMap<>();
-        Database.getInstance();
+    private final StorageService storageService;
+
+    @Autowired
+    public Router(StorageService storageService) {
+        this.storageService = storageService;
     }
 
     /**
@@ -123,7 +125,7 @@ public class Router {
      * @return True for success
      */
     @PostMapping(value = "/api/user/logout")
-    private String logoutUser(@RequestParam String session) {
+    public String logoutUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             userSessions.remove(session);
             return "OK";
@@ -147,7 +149,7 @@ public class Router {
      * @return "OK" on success
      */
     @PostMapping(value = "/api/client/update")
-    private String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
+    public String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
                                 @RequestParam String name, @RequestParam String surname, @RequestParam String address,
                                 @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
                                 @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
@@ -240,7 +242,7 @@ public class Router {
                                   @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
                                   @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
                                   @RequestParam String telephone, @RequestParam String role) {
-        User user = User.createUser(username, Utils.hashPassword(password), false);
+        User user = User.createUser(username, Utils.hashPassword(password), true);
         String session = Utils.createSession();
         userSessions.put(session, user);
         if (user != null) {
@@ -268,7 +270,7 @@ public class Router {
      * @return "OK" on success
      */
     @PostMapping(value = "/api/manager/update")
-    private String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
+    public String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
                                  @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
                                  @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
                                  @RequestParam String telephone, @RequestParam String role) {
@@ -350,6 +352,51 @@ public class Router {
             }
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping(value = "/api/product/{id}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String removeProduct(@PathVariable(value = "id") Integer id, @RequestParam String session) {
+        // Check session
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
+        try {
+            if (Product.getProduct(id) == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (!Product.removeProduct(id))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return "OK";
+    }
+
+    @PostMapping(value = "/api/product/{id}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String updateProduct(@PathVariable(value = "id") Integer id, @RequestBody String body) {
+        // Check session
+        JSONObject json = new JSONObject(body);
+        if (!json.has("session") || !json.has("name") || !json.has("brand") || !json.has("package_size")
+        || !json.has("price") || !json.has("availability"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if (!userSessions.containsKey(json.getString("session")))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
+        try {
+            if (Product.getProduct(id) == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (!Product.updateProduct(id, json.getString("name"), json.getString("brand"), json.getInt("package_size"),
+                    json.getFloat("price"), json.isNull("image") ? null : json.getString("image"), json.getInt(
+                            "availability"), json.getString(
+                            "characteristics"), json.getString("section")))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return "OK";
     }
 
     /**
@@ -484,7 +531,8 @@ public class Router {
         try {
             // Create order
             Integer orderId = Order.createOrder(client.getPayment(), new Date(json.getLong("deliveryStart")),
-                    new Date(json.getLong("deliveryEnd")), 0, user.getId());
+                    new Date(json.getLong("deliveryEnd")), 0, String.format("%s, %d, %s", client.getAddress(),
+                            client.getCap(), client.getCity()), user.getId());
             // Creates product items
             if (OrderItem.batchCreateOrderItems(orderId, map))
                 return "OK";
@@ -500,8 +548,8 @@ public class Router {
      * @param session User session
      * @return JSON with orders array
      */
-    @PostMapping(value = "/api/order/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getAllOrders(@RequestParam String session) {
+    @PostMapping(value = "/api/order/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getUserOrders(@RequestParam String session) {
         if (!userSessions.containsKey(session))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         User user = userSessions.get(session);
@@ -509,6 +557,28 @@ public class Router {
         List<Order> orders;
         try {
             orders = Order.getOrders(user.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        orders.forEach(order -> json.append("orders", order.toJson()));
+        return json.toString();
+    }
+
+    /**
+     * Get all orders for a specific user re a json with an array named orders.
+     *
+     * @param session User session
+     * @return JSON with orders array
+     */
+    @PostMapping(value = "/api/order/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getAllOrders(@RequestParam String session) {
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        JSONObject json = new JSONObject();
+        List<Order> orders;
+        try {
+            orders = Order.getAllOrders();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -538,7 +608,7 @@ public class Router {
         }
         if (order == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        if (!order.getUserId().equals(user.getId()))
+        if (!user.isManager() && !order.getUserId().equals(user.getId()))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         JSONObject json = new JSONObject();
         List<OrderItem> orderItems;
@@ -551,4 +621,38 @@ public class Router {
         orderItems.forEach(item -> json.append("orderItems", item.toJson()));
         return json.toString();
     }
+
+    /**
+     * Update an order state
+     *
+     * @param orderId  order id
+     * @param session  User session
+     * @param newState New state
+     * @return OK on success
+     */
+    @PostMapping(value = "/api/order/{orderId}/update")
+    public String updateOrderState(@PathVariable(value = "orderId") Integer orderId, @RequestParam String session,
+                                   @RequestParam Integer newState) {
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        try {
+            if (Order.getOrder(orderId) == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            if (!Order.updateOrderState(orderId, newState))
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return "OK";
+    }
+
+
+    @PostMapping(value = "/api/product/image/upload")
+    public String productImageUpload(@RequestParam String session, @RequestParam("image") MultipartFile file) {
+        if (!userSessions.containsKey(session) || !userSessions.get(session).isManager())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return storageService.store(file);
+    }
+
 }

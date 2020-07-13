@@ -55,7 +55,7 @@ class OrderItemTest {
 
     @Test
     void createOrderItems() throws SQLException {
-        Integer orderId = Order.createOrder(0, new Date(0), new Date(0), 0, 2);
+        Integer orderId = Order.createOrder(0, new Date(0), new Date(0), 0, "Test", 2);
         Map<Integer, Integer> products = new HashMap<>();
         products.put(1, 1);
         products.put(3, 2);

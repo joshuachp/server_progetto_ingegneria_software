@@ -113,6 +113,35 @@ public class Product {
         return null;
     }
 
+    public static boolean removeProduct(Integer id) throws SQLException {
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("DELETE FROM products WHERE id = ?");
+        statement.setInt(1, id);
+        return statement.executeUpdate() == 1;
+    }
+
+    public static boolean updateProduct(Integer id, String name, String brand, Integer package_size, Float price,
+                                        String image, Integer availability, String characteristics,
+                                        String section) throws SQLException {
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("UPDATE products SET name = ?, brand = ?, package_size = ?, price = ?, image = ?, " +
+                        "availability = ?, characteristics = ?, section = ? WHERE id = ?");
+        statement.setString(1, name);
+        statement.setString(2, brand);
+        statement.setInt(3, package_size);
+        statement.setFloat(4, price);
+        statement.setString(5, image);
+        statement.setInt(6, availability);
+        statement.setString(7, characteristics);
+        statement.setString(8, section);
+        statement.setInt(9, id);
+
+        return statement.executeUpdate() == 1;
+
+    }
+
     public String getName() {
         return name;
     }
