@@ -3,12 +3,14 @@ package org.example.server.routes;
 import org.example.server.database.MockDatabase;
 import org.example.server.models.*;
 import org.example.server.utils.Utils;
+import org.example.server.storage.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,6 +33,8 @@ class RouterTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+	private StorageService storageService;
 
     @BeforeEach
     void setUp() {
