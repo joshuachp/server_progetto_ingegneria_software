@@ -116,7 +116,7 @@ public class Product {
     public static boolean removeProduct(Integer id) throws SQLException {
         Database database = Database.getInstance();
         PreparedStatement statement = database.getConnection()
-                .prepareStatement("SELECT FROM products WHERE id = ?");
+                .prepareStatement("DELETE FROM products WHERE id = ?");
         statement.setInt(1, id);
         return statement.executeUpdate() == 1;
     }
