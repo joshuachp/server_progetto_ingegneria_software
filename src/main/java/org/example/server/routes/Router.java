@@ -85,7 +85,7 @@ public class Router {
      * @return Return JSONObject of user data
      */
     @PostMapping(value = "/api/user/session", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String autenticateUser(@RequestParam String session) {
+    public String authUser(@RequestParam String session) {
         if (userSessions.containsKey(session)) {
             User user = User.getUser(userSessions.get(session).getUsername());
             if (user != null) {
@@ -150,9 +150,9 @@ public class Router {
      */
     @PostMapping(value = "/api/client/update")
     public String updateClient(@RequestParam String session, @RequestParam(required = false) String password,
-                                @RequestParam String name, @RequestParam String surname, @RequestParam String address,
-                                @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
-                                @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
+                               @RequestParam String name, @RequestParam String surname, @RequestParam String address,
+                               @RequestParam Integer cap, @RequestParam String city, @RequestParam String telephone,
+                               @RequestParam Integer payment, @RequestParam(required = false) Integer card_number) {
         if (userSessions.containsKey(session)) {
             // If set update user password
             User user = userSessions.get(session);
@@ -271,9 +271,9 @@ public class Router {
      */
     @PostMapping(value = "/api/manager/update")
     public String updateManager(@RequestParam String session, @RequestParam(required = false) String password,
-                                 @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
-                                 @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
-                                 @RequestParam String telephone, @RequestParam String role) {
+                                @RequestParam String badge, @RequestParam String name, @RequestParam String surname,
+                                @RequestParam String address, @RequestParam Integer cap, @RequestParam String city,
+                                @RequestParam String telephone, @RequestParam String role) {
         if (userSessions.containsKey(session)) {
             // If set update user password
             User user = userSessions.get(session);
@@ -378,7 +378,7 @@ public class Router {
         // Check session
         JSONObject json = new JSONObject(body);
         if (!json.has("session") || !json.has("name") || !json.has("brand") || !json.has("package_size")
-        || !json.has("price") || !json.has("availability"))
+                || !json.has("price") || !json.has("availability"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         if (!userSessions.containsKey(json.getString("session")))
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -535,7 +535,10 @@ public class Router {
                             client.getCap(), client.getCity()), user.getId());
             // Creates product items
             if (OrderItem.batchCreateOrderItems(orderId, map))
-                return "OK";
+                if (client.getLoyaltyCardNumber() != null)
+                    if (!LoyaltyCard.updatePoints(client.getLoyaltyCardNumber(), orderId))
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            return "OK";
         } catch (SQLException e) {
             e.printStackTrace();
         }

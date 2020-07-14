@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Objects;
 
 public class LoyaltyCard {
 
@@ -45,6 +46,16 @@ public class LoyaltyCard {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean updatePoints(Integer card_number, Integer orderId) throws SQLException {
+        int total = (int) Math.floor(Objects.requireNonNull(Order.getOrder(orderId)).getTotal());
+        Database database = Database.getInstance();
+        PreparedStatement statement = database.getConnection()
+                .prepareStatement("UPDATE loyalty_cards SET points = (points + ?) WHERE card_number = ?");
+        statement.setInt(1, total);
+        statement.setInt(2, card_number);
+        return statement.executeUpdate() == 1;
     }
 
     public Integer getId() {

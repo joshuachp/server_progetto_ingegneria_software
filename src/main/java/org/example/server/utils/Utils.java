@@ -50,12 +50,12 @@ public class Utils {
     }
 
     /**
-     * Converts a Map<String, Object> into a Map<Integer,Integer>
+     * Converts a {@link Map}<{@link String},{@link Object}> into a {@link Map}<{@link Integer},{@link Integer}>
      *
      * @param map Starting map
      * @return Converted map
      */
-    public static Map<Integer, Integer> convertToIntegerMap(Map<String, Object> map) {
+    public static Map<Integer, Integer> convertToIntegerMap(@NotNull Map<String, Object> map) {
         return map.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
