@@ -84,6 +84,8 @@ CREATE TABLE order_items (
 
 ------------------------------------------------------------------------------------------------------------------------
 
+BEGIN TRANSACTION;
+
 INSERT INTO users (username, password, manager)
     VALUES('admin', '$2b$10$swPp91a8qj40VkcBEn704eIFNOQ1Tvwxc2lZlQppIq/VgyLFLfzpS', 1); -- 1:admin:password
 
@@ -104,19 +106,21 @@ INSERT INTO sections(name) VALUES("Section 1");
 INSERT INTO sections(name) VALUES("Section 2");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 1.50,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', "Section 1");
+    VALUES ('Mascara', 'Brand', 1, 1.50,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', 'Cosmetici');
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 2.30, NULL, 0, 'Characteristics', "Section 1");
+    VALUES ('Latte', 'Brand', 1, 2.30, NULL, 0, 'Characteristics', 'Alimentari');
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Product', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', "Section 2");
+    VALUES ('Broccoli', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', 'Alimentari');
 
 INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, user_id)
     VALUES (3.80, 0, 0, 0, 0, 'Via Viale 1, 33333, City', 2);
 
 INSERT INTO order_items(name, price, quantity, product_id, order_id)
-    VALUES ("Product", 1.50, 1, 1, 1);
+    VALUES ('Mascara', 1.50, 1, 1, 1);
 
 INSERT INTO order_items(name, price, quantity, product_id, order_id)
-    VALUES ("Product", 2.30, 2, 2, 1);
+    VALUES ('Latte', 2.30, 2, 2, 1);
+
+END TRANSACTION;
