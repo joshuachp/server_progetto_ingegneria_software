@@ -149,7 +149,6 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Fesa di Tacchino', 'Esse...lunga', 1, 4.40, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/708303.jpg', 10, 'pollo',
     'Carne');
->>>>>>> develop
 
 INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, user_id)
     VALUES (3.80, 0, 0, 0, 0, 'Via Viale 1, 33333, City', 2);
