@@ -127,10 +127,6 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
     'Frutta e verdura');
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Filetto di tonno', 'Granny Smith', 4, 1.98, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731307.jpg', 10, 'Pesce fresco',
-    'Pesce');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Filetto di tonno', 'Pinne gialle', 2, 7.68, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731307.jpg', 10, 'Pesce fresco',
     'Pesce');
 
