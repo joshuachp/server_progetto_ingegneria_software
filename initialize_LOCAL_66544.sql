@@ -114,43 +114,6 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Broccoli', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', 'Alimentari');
 
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Mele', 'Granny Smith', 4, 1.98, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/761346.jpg', 10, 'Bio',
-    'Frutta e verdura');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Coste confezionate', 'Naturama', 10, 1.98, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/763276.jpg', 10, '',
-    'Frutta e verdura');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Cavolfiore', 'Esse...lunga', 1, 1.58, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/763187.jpg', 10, 'OGM',
-    'Frutta e verdura');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Filetto di tonno', 'Granny Smith', 4, 1.98, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731307.jpg', 10, 'Pesce fresco',
-    'Pesce');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Filetto di tonno', 'Pinne gialle', 2, 7.68, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731307.jpg', 10, 'Pesce fresco',
-    'Pesce');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Orata Eviscerata', 'Esse...lunga', 4, 8.33, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731005.jpg', 10, 'Pesce fresco',
-    'Pesce');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Filetto di salmone', 'Esse...lunga', 2, 8.36, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/731228.jpg', 10, 'Pesce fresco',
-    'Pesce');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Scottona polpa trita', 'Naturama', 1, 4.40, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/707923.jpg', 10, 'halal',
-    'Carne');
-
-INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
-    VALUES ('Fesa di Tacchino', 'Esse...lunga', 1, 4.40, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/708303.jpg', 10, 'pollo',
-    'Carne');
->>>>>>> develop
-
 INSERT INTO orders(total, payment, delivery_start, delivery_end, state, address, user_id)
     VALUES (3.80, 0, 0, 0, 0, 'Via Viale 1, 33333, City', 2);
 

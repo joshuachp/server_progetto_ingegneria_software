@@ -106,6 +106,7 @@ INSERT INTO sections(name) VALUES("Section 1");
 INSERT INTO sections(name) VALUES("Section 2");
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+<<<<<<< HEAD
     VALUES ('Mascara', 'Brand', 1, 1.50,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', 'Cosmetici');
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
@@ -113,6 +114,14 @@ INSERT INTO products(name, brand, package_size, price, image, availability, char
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Broccoli', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', 'Alimentari');
+=======
+    VALUES ('Product', 'Brand', 1, 1.50,  'http://localhost:8080/images/mascara.jpg', 1, 'Characteristics', 'Section 1');
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+    VALUES ('Product', 'Brand', 1, 2.30, NULL, 0, 'Characteristics', 'Section 1');
+
+INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
+    VALUES ('Product', 'Brand', 1, 5.20, 'http://localhost:8080/images/broccoli.jpg', 3, 'Characteristics', 'Section 2');
 
 INSERT INTO products(name, brand, package_size, price, image, availability, characteristics, section)
     VALUES ('Mele', 'Granny Smith', 4, 1.98, 'https://images.services.esselunga.it/html/img_prodotti/esselunga/medium2/761346.jpg', 10, 'Bio',
